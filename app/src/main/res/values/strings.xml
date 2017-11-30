@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Beetimer</string>
+    <string name="item_submit">Submit</string>
+    <string name="item_reset">Reset</string>
 </resources>
