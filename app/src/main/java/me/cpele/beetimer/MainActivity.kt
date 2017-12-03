@@ -16,6 +16,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setupSignInButton()
+        setupTokenHandler()
+    }
+
+    private fun setupSignInButton() {
         val signInButton = main_bt_sign_in
         signInButton.setOnClickListener {
             val uri = Uri.parse("https://www.beeminder.com/apps/authorize?" +
@@ -23,17 +28,16 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
         }
+    }
 
-        intent?.apply {
-            if (action == Intent.ACTION_VIEW) {
-                data?.apply {
-                    if (scheme == "beetimer" && host == "auth_callback") {
-                        val accessToken = getQueryParameter("access_token")
-                        Toast.makeText(this@MainActivity, "Token: $accessToken", Toast.LENGTH_LONG)
-                                .show()
-                    }
-                }
-            }
+    private fun setupTokenHandler() {
+        val data = intent?.data
+        val action = intent?.action
+        val scheme = data?.scheme
+        val host = data?.host
+        if (action == Intent.ACTION_VIEW && scheme == "beetimer" && host == "auth_callback") {
+            val accessToken = data.getQueryParameter("access_token")
+            Toast.makeText(this@MainActivity, "Token: $accessToken", Toast.LENGTH_LONG).show()
         }
     }
 }
