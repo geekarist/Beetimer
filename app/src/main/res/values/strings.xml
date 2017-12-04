@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Beetimer</string>
-    <string name="item_submit">Submit</string>
-    <string name="item_reset">Reset</string>
+
     <string name="main_derail_label">till derailment</string>
     <string name="main_sign_in">Sign in</string>
+
+    <string name="item_reset">Reset</string>
+    <string name="item_submit">Submit</string>
+    <string name="item_derail_time">%1$02dh %2$02dm %3$02ds</string>
 </resources>
