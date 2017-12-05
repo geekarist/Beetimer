@@ -21,9 +21,6 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         val rateView: TextView = itemView.findViewById(R.id.item_rate)
         rateView.text = mContext.getString(R.string.item_rate, goal.rate, goal.runits)
 
-        val bareMinView: TextView = itemView.findViewById(R.id.item_bare_min)
-        bareMinView.text = goal.delta_text
-
         @Suppress("DEPRECATION")
         goal.losedate?.let {
 
@@ -46,6 +43,9 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
             derailHoursView.text = mContext.getString(
                     R.string.item_derail_time, numDerailHours, numDerailMin, numDerailSec)
             derailHoursView.setBackgroundColor(mContext.resources.getColor(color))
+
+            val bareMinView: TextView = itemView.findViewById(R.id.item_bare_min)
+            bareMinView.text = mContext.getString(R.string.item_bare_min, 0.4.toString(), numDerailDays)
         }
     }
 }
