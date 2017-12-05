@@ -1,11 +1,16 @@
 package me.cpele.beetimer
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 import java.util.concurrent.TimeUnit
 
 class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+
+    private val mContext: Context
+        get() = itemView.context
+
     fun bind(goal: Goal) {
         val idView: TextView = itemView.findViewById(R.id.item_id)
         idView.text = goal.slug
@@ -28,8 +33,8 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
                     TimeUnit.SECONDS.toDays(goal.losedate) -
                             TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis())
             val derailDaysView: TextView = itemView.findViewById(R.id.item_derail_days)
-            derailDaysView.text = numDerailDays.toString()
-            derailDaysView.setBackgroundColor(itemView.context.resources.getColor(color))
+            derailDaysView.text = mContext.getString(R.string.item_derail_date, numDerailDays)
+            derailDaysView.setBackgroundColor(mContext.resources.getColor(color))
 
             val numDerailHours =
                     TimeUnit.SECONDS.toHours(goal.losedate) -
@@ -38,9 +43,9 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
             val derailHoursView: TextView = itemView.findViewById(R.id.item_derail_time)
             val numDerailMin = 51
             val numDerailSec = 16
-            derailHoursView.text = itemView.context.getString(
+            derailHoursView.text = mContext.getString(
                     R.string.item_derail_time, numDerailHours, numDerailMin, numDerailSec)
-            derailHoursView.setBackgroundColor(itemView.context.resources.getColor(color))
+            derailHoursView.setBackgroundColor(mContext.resources.getColor(color))
         }
     }
 }
