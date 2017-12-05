@@ -8,4 +8,5 @@
     <string name="item_submit">Submit</string>
     <string name="item_derail_time">%1$02dh %2$02dm %3$02ds</string>
     <string name="item_derail_date">%1$dd</string>
+    <string name="item_rate">Rate: %1$s/%2$s</string>
 </resources>

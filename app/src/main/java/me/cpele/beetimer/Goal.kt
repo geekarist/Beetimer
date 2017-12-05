@@ -9,7 +9,8 @@ data class Goal(
         val delta_text: String?,
         val losedate: Long?,
         private val lane: Int?,
-        private val yaw: Int?) {
+        private val yaw: Int?,
+        val runits: String?) {
 
     val color: Int
         @ColorRes

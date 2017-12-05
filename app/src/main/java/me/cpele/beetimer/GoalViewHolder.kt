@@ -19,7 +19,7 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         titleView.text = goal.title
 
         val rateView: TextView = itemView.findViewById(R.id.item_rate)
-        rateView.text = goal.rate
+        rateView.text = mContext.getString(R.string.item_rate, goal.rate, goal.runits)
 
         val bareMinView: TextView = itemView.findViewById(R.id.item_bare_min)
         bareMinView.text = goal.delta_text
