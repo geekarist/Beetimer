@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        main_vf.displayedChild = 1
+
         val retrofit = Retrofit.Builder()
                 .baseUrl("https://www.beeminder.com")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -78,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.let {
                     mAdapter.addAll(it)
-                    main_vf.displayedChild = 1
+                    main_vf.displayedChild = 0
                 }
             }
         })
