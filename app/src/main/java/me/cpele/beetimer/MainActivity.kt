@@ -3,6 +3,7 @@ package me.cpele.beetimer
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
@@ -13,6 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 private const val BMNDR_CLIENT_ID = "30zxgk213ellu3dj730wto3qj"
 private const val BMNDR_REDIRECT_URI = "beetimer://auth_callback"
+private const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,12 +51,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupTokenHandler() {
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        if (prefs.contains(PREF_ACCESS_TOKEN)) {
+            fetchUser(prefs.getString(PREF_ACCESS_TOKEN, null))
+            return
+        }
+
         val data = intent?.data
         val action = intent?.action
         val scheme = data?.scheme
         val host = data?.host
         if (action == Intent.ACTION_VIEW && scheme == "beetimer" && host == "auth_callback") {
             val accessToken = data.getQueryParameter("access_token")
+            prefs.edit().putString(PREF_ACCESS_TOKEN, accessToken).apply()
             fetchUser(accessToken)
         }
     }
