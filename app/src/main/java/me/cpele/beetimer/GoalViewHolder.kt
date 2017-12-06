@@ -36,15 +36,27 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
             derailDaysView.text = mContext.getString(R.string.item_derail_date, numDerailDays)
             derailDaysView.setBackgroundColor(mContext.resources.getColor(color))
 
+            val derailHoursView: TextView = itemView.findViewById(R.id.item_derail_time)
+
             val numDerailHours =
                     TimeUnit.SECONDS.toHours(goal.losedate) -
                             TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis()) -
                             TimeUnit.DAYS.toHours(numDerailDays)
-            val derailHoursView: TextView = itemView.findViewById(R.id.item_derail_time)
-            val numDerailMin = 51
-            val numDerailSec = 16
+
+            val numDerailMin = TimeUnit.SECONDS.toMinutes(goal.losedate) -
+                    TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis()) -
+                    TimeUnit.DAYS.toMinutes(numDerailDays) -
+                    TimeUnit.HOURS.toMinutes(numDerailHours)
+
+            val numDerailSec = TimeUnit.SECONDS.toSeconds(goal.losedate) -
+                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) -
+                    TimeUnit.DAYS.toSeconds(numDerailDays) -
+                    TimeUnit.HOURS.toSeconds(numDerailHours) -
+                    TimeUnit.MINUTES.toSeconds(numDerailMin)
+
             derailHoursView.text = mContext.getString(
                     R.string.item_derail_time, numDerailHours, numDerailMin, numDerailSec)
+
             derailHoursView.setBackgroundColor(mContext.resources.getColor(color))
         }
     }
