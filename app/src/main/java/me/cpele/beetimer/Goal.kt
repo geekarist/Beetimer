@@ -10,7 +10,8 @@ data class Goal(
         val losedate: Long?,
         private val lane: Int?,
         private val yaw: Int?,
-        val runits: String?) {
+        val runits: String?,
+        val limsum: String?) {
 
     val color: Int
         @ColorRes
