@@ -9,8 +9,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 private const val BMNDR_CLIENT_ID = "30zxgk213ellu3dj730wto3qj"
 private const val BMNDR_REDIRECT_URI = "beetimer://auth_callback"
@@ -18,7 +16,6 @@ private const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mApi: BeeminderApi
     private lateinit var mAdapter: GoalAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,12 +23,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         main_vf.displayedChild = 1
-
-        val retrofit = Retrofit.Builder()
-                .baseUrl("https://www.beeminder.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        mApi = retrofit.create(BeeminderApi::class.java)
 
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
@@ -71,7 +62,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchUser(accessToken: String) {
-        mApi.getUser(accessToken).enqueue(object: Callback<User> {
+
+        CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 TODO("not implemented")
             }
@@ -83,7 +75,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchGoals(accessToken: String, user: String) {
-        mApi.getGoals(user, accessToken).enqueue(object: Callback<List<Goal>> {
+
+        CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
                 TODO("not implemented")
             }
