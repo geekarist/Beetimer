@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -17,6 +18,7 @@ private const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mAdapter: GoalAdapter
+    private var mMenu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,22 @@ class MainActivity : AppCompatActivity() {
 
         setupSignInButton()
         setupTokenHandler()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val displayMenu = super.onCreateOptionsMenu(menu)
+
+        menuInflater.inflate(R.menu.main_options_menu, menu)
+
+        mMenu = menu
+
+        menu?.findItem(R.id.main_menu_sync)?.setOnMenuItemClickListener {
+            it.setIcon(R.drawable.ic_sync_problem_white_24dp)
+            setupTokenHandler()
+            true
+        }
+
+        return displayMenu
     }
 
     private fun setupSignInButton() {
@@ -85,6 +103,7 @@ class MainActivity : AppCompatActivity() {
                 response?.body()?.let {
                     mAdapter.addAll(it)
                     main_vf.displayedChild = 0
+                    mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_white_24dp)
                 }
             }
         })
