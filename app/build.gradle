@@ -17,6 +17,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        // This is a release build that can be run on the emulator because it's not signed
+        production {
+            initWith(buildTypes.release)
+            signingConfig signingConfigs.debug
+        }
     }
 }
 

@@ -18,12 +18,14 @@ class CustomApp : Application() {
     }
 
     val api: BeeminderApi by lazy {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        // TODO Limit with BuildConfig.DEBUG
         val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-                .build()
+                .let {
+                    if (BuildConfig.DEBUG) {
+                        val loggingInterceptor = HttpLoggingInterceptor()
+                        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+                        it.addInterceptor(loggingInterceptor)
+                    } else it
+                }.build()
         val retrofit = Retrofit.Builder()
                 .baseUrl("https://www.beeminder.com")
                 .addConverterFactory(GsonConverterFactory.create())
