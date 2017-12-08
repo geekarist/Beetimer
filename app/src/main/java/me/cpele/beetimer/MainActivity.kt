@@ -5,8 +5,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -113,12 +115,28 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun startSyncAnim() =
-            mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+    private fun startSyncAnim() {
 
-    private fun succeedSyncAnim() =
-            mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_white_24dp)
+        val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
+        val syncActionView = LayoutInflater.from(this).inflate(R.layout.view_action_sync, null)
+        syncActionView.startAnimation(syncAnimation)
 
-    private fun failSyncAnim() =
-            mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+        val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.actionView = syncActionView
+        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+    }
+
+    private fun succeedSyncAnim() {
+        val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.setIcon(R.drawable.ic_sync_white_24dp)
+        item?.actionView?.clearAnimation()
+        item?.actionView = null
+    }
+
+    private fun failSyncAnim() {
+        val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+        item?.actionView?.clearAnimation()
+        item?.actionView = null
+    }
 }
