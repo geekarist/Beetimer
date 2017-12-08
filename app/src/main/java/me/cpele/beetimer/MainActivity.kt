@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
+import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,18 +36,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val displayMenu = super.onCreateOptionsMenu(menu)
-
         menuInflater.inflate(R.menu.main_options_menu, menu)
-
         mMenu = menu
-
-        menu?.findItem(R.id.main_menu_sync)?.setOnMenuItemClickListener {
-            it.setIcon(R.drawable.ic_sync_problem_white_24dp)
-            setupTokenHandler()
-            true
-        }
-
         return displayMenu
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        return when (item?.itemId) {
+            R.id.main_menu_sync -> {
+                startSyncAnim()
+                setupTokenHandler()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupSignInButton() {
@@ -83,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
-                TODO("not implemented")
+                failSyncAnim()
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
@@ -96,16 +100,25 @@ class MainActivity : AppCompatActivity() {
 
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
-                TODO("not implemented")
+                failSyncAnim()
             }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.let {
                     mAdapter.addAll(it)
                     main_vf.displayedChild = 0
-                    mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_white_24dp)
+                    succeedSyncAnim()
                 }
             }
         })
     }
+
+    private fun startSyncAnim() =
+            mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+
+    private fun succeedSyncAnim() =
+            mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_white_24dp)
+
+    private fun failSyncAnim() =
+            mMenu?.findItem(R.id.main_menu_sync)?.setIcon(R.drawable.ic_sync_problem_white_24dp)
 }
