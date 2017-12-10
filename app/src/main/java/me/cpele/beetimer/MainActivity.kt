@@ -1,14 +1,17 @@
 package me.cpele.beetimer
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,12 +36,13 @@ class MainActivity : AppCompatActivity() {
         main_rv.adapter = mAdapter
 
         setupSignInButton()
-        setupTokenHandler()
+        handleToken()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
+        Handler().post({ startSyncAnim() })
         mMenu = menu
         return displayMenu
     }
@@ -48,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         return when (item?.itemId) {
             R.id.main_menu_sync -> {
                 startSyncAnim()
-                setupTokenHandler()
+                handleToken()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -65,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupTokenHandler() {
+    private fun handleToken() {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -89,11 +93,14 @@ class MainActivity : AppCompatActivity() {
 
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
+                Toast.makeText(this@MainActivity, "Error retrieving user: ${t.toString()}", Toast.LENGTH_LONG).show()
                 failSyncAnim()
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
-                response?.body()?.username?.let { fetchGoals(accessToken, it) }
+                response?.body()?.username?.let {
+                    fetchGoals(accessToken, it)
+                }
             }
         })
     }
@@ -102,6 +109,7 @@ class MainActivity : AppCompatActivity() {
 
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
+                Toast.makeText(this@MainActivity, "Error retrieving goals: ${t.toString()}", Toast.LENGTH_LONG).show()
                 failSyncAnim()
             }
 
@@ -115,6 +123,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    @SuppressLint("InflateParams")
     private fun startSyncAnim() {
 
         val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
@@ -128,15 +137,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun succeedSyncAnim() {
         val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.setIcon(R.drawable.ic_sync_white_24dp)
         item?.actionView?.clearAnimation()
         item?.actionView = null
+        item?.setIcon(R.drawable.ic_sync_white_24dp)
     }
 
     private fun failSyncAnim() {
         val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
         item?.actionView?.clearAnimation()
         item?.actionView = null
+        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
     }
 }
