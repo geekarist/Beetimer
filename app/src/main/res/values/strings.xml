@@ -2,7 +2,7 @@
     <string name="app_name">Beetimer</string>
 
     <string name="main_derail_label">till derailment</string>
-    <string name="main_sign_in">Sign in</string>
+    <string name="sign_in_title">Sign in</string>
 
     <string name="item_reset">Reset</string>
     <string name="item_submit">Submit</string>

@@ -18,7 +18,10 @@
         tools:ignore="GoogleAppIndexingWarning"
         >
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"/>
+
+        <activity android:name=".SignInActivity">
+
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.MAIN"/>
@@ -35,6 +38,7 @@
                     android:scheme="beetimer"
                     />
             </intent-filter>
+
         </activity>
 
     </application>

@@ -1,11 +1,10 @@
 package me.cpele.beetimer
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,26 +16,29 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-private const val BMNDR_CLIENT_ID = "30zxgk213ellu3dj730wto3qj"
-private const val BMNDR_REDIRECT_URI = "beetimer://auth_callback"
-private const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
+private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mAdapter: GoalAdapter
     private var mMenu: Menu? = null
 
+    companion object {
+        fun start(context: Context, token: String) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(ARG_ACCESS_TOKEN, token)
+            context.startActivity(intent)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        main_vf.displayedChild = 1
-
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
 
-        setupSignInButton()
-        handleToken()
+        initiateFetch()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -52,41 +54,15 @@ class MainActivity : AppCompatActivity() {
         return when (item?.itemId) {
             R.id.main_menu_sync -> {
                 startSyncAnim()
-                handleToken()
+                initiateFetch()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun setupSignInButton() {
-        val signInButton = main_bt_sign_in
-        signInButton.setOnClickListener {
-            val uri = Uri.parse("https://www.beeminder.com/apps/authorize?" +
-                    "client_id=$BMNDR_CLIENT_ID&redirect_uri=$BMNDR_REDIRECT_URI&response_type=token")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            startActivity(intent)
-        }
-    }
-
-    private fun handleToken() {
-
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-
-        if (prefs.contains(PREF_ACCESS_TOKEN)) {
-            fetchUser(prefs.getString(PREF_ACCESS_TOKEN, null))
-            return
-        }
-
-        val data = intent?.data
-        val action = intent?.action
-        val scheme = data?.scheme
-        val host = data?.host
-        if (action == Intent.ACTION_VIEW && scheme == "beetimer" && host == "auth_callback") {
-            val accessToken = data.getQueryParameter("access_token")
-            prefs.edit().putString(PREF_ACCESS_TOKEN, accessToken).apply()
-            fetchUser(accessToken)
-        }
+    private fun initiateFetch() {
+        fetchUser(intent.getStringExtra(ARG_ACCESS_TOKEN))
     }
 
     private fun fetchUser(accessToken: String) {
@@ -116,7 +92,6 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.let {
                     mAdapter.addAll(it)
-                    main_vf.displayedChild = 0
                     succeedSyncAnim()
                 }
             }

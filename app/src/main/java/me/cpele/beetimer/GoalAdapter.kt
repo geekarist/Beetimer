@@ -20,5 +20,8 @@ class GoalAdapter: RecyclerView.Adapter<GoalViewHolder>() {
 
     override fun getItemCount(): Int = items.size
 
-    fun addAll(items: List<Goal>) = this.items.addAll(items)
+    fun addAll(items: List<Goal>) {
+        this.items.addAll(items)
+        notifyDataSetChanged()
+    }
 }
