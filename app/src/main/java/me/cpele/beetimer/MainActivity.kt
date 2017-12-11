@@ -17,6 +17,9 @@ import retrofit2.Callback
 import retrofit2.Response
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
+private const val CHILD_LOADING = 0
+private const val CHILD_GOALS = 1
+private const val CHILD_ERROR = 2
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
-        Handler().post({ startSyncAnim() })
+        Handler().post { startSyncAnim() }
         mMenu = menu
         return displayMenu
     }
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initiateFetch() {
+        if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
         fetchUser(intent.getStringExtra(ARG_ACCESS_TOKEN))
     }
 
@@ -71,6 +75,7 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 Toast.makeText(this@MainActivity, "Error retrieving user: ${t.toString()}", Toast.LENGTH_LONG).show()
                 failSyncAnim()
+                if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
@@ -87,12 +92,14 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
                 Toast.makeText(this@MainActivity, "Error retrieving goals: ${t.toString()}", Toast.LENGTH_LONG).show()
                 failSyncAnim()
+                if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
             }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.let {
                     mAdapter.addAll(it)
                     succeedSyncAnim()
+                    main_vf.displayedChild = CHILD_GOALS
                 }
             }
         })

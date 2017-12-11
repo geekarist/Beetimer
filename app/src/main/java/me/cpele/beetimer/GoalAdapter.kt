@@ -24,4 +24,6 @@ class GoalAdapter: RecyclerView.Adapter<GoalViewHolder>() {
         this.items.addAll(items)
         notifyDataSetChanged()
     }
+
+    fun isEmpty(): Boolean = items.isEmpty()
 }

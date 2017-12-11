@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Beetimer</string>
 
-    <string name="main_derail_label">till derailment</string>
     <string name="sign_in_title">Sign in</string>
 
     <string name="item_reset">Reset</string>
@@ -10,6 +9,10 @@
     <string name="item_derail_date">%1$dd</string>
     <string name="item_rate">Rate: %1$s/%2$s</string>
     <string name="item_bare_min">+%1$s in %2$d days</string>
+
+    <string name="main_derail_label">till derailment</string>
     <string name="main_synchronize">Synchronize</string>
     <string name="action_synchronize">Synchronize</string>
+    <string name="main_loading">Loading…</string>
+    <string name="main_error">Error loading goals.</string>
 </resources>
