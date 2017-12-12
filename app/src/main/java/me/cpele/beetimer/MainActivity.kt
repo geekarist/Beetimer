@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -25,6 +25,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mAdapter: GoalAdapter
     private var mMenu: Menu? = null
+    private lateinit var mStatus: SyncStatus
+
+    private enum class SyncStatus {
+        SUCCESS, LOADING, FAILURE
+    }
 
     companion object {
         fun start(context: Context, token: String) {
@@ -35,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(localClassName, "onCreate")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -45,17 +51,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        Log.d(localClassName, "onCreateOptionsMenu")
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
         mMenu = menu
+        displaySyncStatus()
         return displayMenu
+    }
+
+    private fun displaySyncStatus() {
+        when (mStatus) {
+            SyncStatus.SUCCESS -> succeedSyncAnim()
+            SyncStatus.LOADING -> startSyncAnim()
+            SyncStatus.FAILURE -> failSyncAnim()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
+        Log.d(localClassName, "onOptionsItemSelected")
         return when (item?.itemId) {
             R.id.main_menu_sync -> {
-                startSyncAnim()
                 initiateFetch()
                 true
             }
@@ -64,9 +80,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initiateFetch() {
-        startSyncAnim()
+        changeSyncStatus(SyncStatus.LOADING)
+        displaySyncStatus()
         if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
         fetchUser(intent.getStringExtra(ARG_ACCESS_TOKEN))
+    }
+
+    private fun changeSyncStatus(status: SyncStatus) {
+        Log.d(localClassName, "Setting status to: ${status}")
+        mStatus = status
     }
 
     private fun fetchUser(accessToken: String) {
@@ -74,7 +96,8 @@ class MainActivity : AppCompatActivity() {
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 Toast.makeText(this@MainActivity, "Error retrieving user: ${t.toString()}", Toast.LENGTH_LONG).show()
-                failSyncAnim()
+                changeSyncStatus(SyncStatus.FAILURE)
+                displaySyncStatus()
                 if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
             }
 
@@ -91,14 +114,16 @@ class MainActivity : AppCompatActivity() {
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
                 Toast.makeText(this@MainActivity, "Error retrieving goals: ${t.toString()}", Toast.LENGTH_LONG).show()
-                failSyncAnim()
+                changeSyncStatus(SyncStatus.FAILURE)
+                displaySyncStatus()
                 if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
             }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.let {
                     mAdapter.addAll(it)
-                    succeedSyncAnim()
+                    changeSyncStatus(SyncStatus.SUCCESS)
+                    displaySyncStatus()
                     main_vf.displayedChild = CHILD_GOALS
                 }
             }
@@ -108,33 +133,30 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("InflateParams")
     private fun startSyncAnim() {
 
-        Handler().postDelayed({
+        Log.d(localClassName, "startSyncAnim")
 
-            val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
-            val syncActionView = LayoutInflater.from(this).inflate(R.layout.view_action_sync, null)
-            syncActionView.startAnimation(syncAnimation)
+        val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
+        val syncActionView = LayoutInflater.from(this).inflate(R.layout.view_action_sync, null)
+        syncActionView.startAnimation(syncAnimation)
 
-            val item = mMenu?.findItem(R.id.main_menu_sync)
-            item?.actionView = syncActionView
-            item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
-        }, 1000)
+        val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.actionView = syncActionView
+        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
     }
 
     private fun succeedSyncAnim() {
-        Handler().postDelayed({
-            val item = mMenu?.findItem(R.id.main_menu_sync)
-            item?.actionView?.clearAnimation()
-            item?.actionView = null
-            item?.setIcon(R.drawable.ic_sync_white_24dp)
-        }, 1000)
+        Log.d(localClassName, "succeedSyncAnim")
+        val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.actionView?.clearAnimation()
+        item?.actionView = null
+        item?.setIcon(R.drawable.ic_sync_white_24dp)
     }
 
     private fun failSyncAnim() {
-        Handler().postDelayed({
-            val item = mMenu?.findItem(R.id.main_menu_sync)
-            item?.actionView?.clearAnimation()
-            item?.actionView = null
-            item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
-        }, 1000)
+        Log.d(localClassName, "failSyncAnim")
+        val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.actionView?.clearAnimation()
+        item?.actionView = null
+        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
     }
 }
