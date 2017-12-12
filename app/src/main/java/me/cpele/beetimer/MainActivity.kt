@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
-        Handler().post { startSyncAnim() }
         mMenu = menu
         return displayMenu
     }
@@ -65,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initiateFetch() {
+        startSyncAnim()
         if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
         fetchUser(intent.getStringExtra(ARG_ACCESS_TOKEN))
     }
@@ -108,26 +108,33 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("InflateParams")
     private fun startSyncAnim() {
 
-        val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
-        val syncActionView = LayoutInflater.from(this).inflate(R.layout.view_action_sync, null)
-        syncActionView.startAnimation(syncAnimation)
+        Handler().postDelayed({
 
-        val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.actionView = syncActionView
-        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+            val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
+            val syncActionView = LayoutInflater.from(this).inflate(R.layout.view_action_sync, null)
+            syncActionView.startAnimation(syncAnimation)
+
+            val item = mMenu?.findItem(R.id.main_menu_sync)
+            item?.actionView = syncActionView
+            item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+        }, 1000)
     }
 
     private fun succeedSyncAnim() {
-        val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.actionView?.clearAnimation()
-        item?.actionView = null
-        item?.setIcon(R.drawable.ic_sync_white_24dp)
+        Handler().postDelayed({
+            val item = mMenu?.findItem(R.id.main_menu_sync)
+            item?.actionView?.clearAnimation()
+            item?.actionView = null
+            item?.setIcon(R.drawable.ic_sync_white_24dp)
+        }, 1000)
     }
 
     private fun failSyncAnim() {
-        val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.actionView?.clearAnimation()
-        item?.actionView = null
-        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+        Handler().postDelayed({
+            val item = mMenu?.findItem(R.id.main_menu_sync)
+            item?.actionView?.clearAnimation()
+            item?.actionView = null
+            item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+        }, 1000)
     }
 }
