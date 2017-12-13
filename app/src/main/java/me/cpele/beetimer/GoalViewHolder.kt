@@ -17,6 +17,11 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         itemView.item_rate.text = mContext.getString(R.string.item_rate, goal.rate, goal.runits)
         itemView.item_bare_min.text = goal.limsum
 
+        val timerView = itemView.item_timer
+        timerView.setOnClickListener {
+            if (timerView.running) timerView.stop() else timerView.start()
+        }
+
         @Suppress("DEPRECATION")
         goal.losedate?.let {
 
