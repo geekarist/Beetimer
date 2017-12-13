@@ -1,6 +1,7 @@
 package me.cpele.beetimer
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -16,27 +17,13 @@ class SignInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. Try getting token from preferences
-
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-        if (prefs.contains(PREF_ACCESS_TOKEN)) {
-            MainActivity.start(this, prefs.getString(PREF_ACCESS_TOKEN, null))
-            return
-        }
+        // 1. Try getting token from preferences
+        if (trySavedToken(prefs)) return
 
         // 2. Try getting token from intent
-
-        val data = intent?.data
-        val action = intent?.action
-        val scheme = data?.scheme
-        val host = data?.host
-        if (action == Intent.ACTION_VIEW && scheme == "beetimer" && host == "auth_callback") {
-            val accessToken = data.getQueryParameter("access_token")
-            prefs.edit().putString(PREF_ACCESS_TOKEN, accessToken).apply()
-            MainActivity.start(this, accessToken)
-            return
-        }
+        if (tryProvidedToken(prefs, intent)) return
 
         // 3. Setup view to initiate signin process
 
@@ -49,5 +36,35 @@ class SignInActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        tryProvidedToken(prefs, intent)
+    }
+
+    private fun tryProvidedToken(prefs: SharedPreferences, intent: Intent?): Boolean {
+        val data = intent?.data
+        val action = intent?.action
+        val scheme = data?.scheme
+        val host = data?.host
+        if (action == Intent.ACTION_VIEW && scheme == "beetimer" && host == "auth_callback") {
+            val accessToken = data.getQueryParameter("access_token")
+            prefs.edit().putString(PREF_ACCESS_TOKEN, accessToken).apply()
+            MainActivity.start(this, accessToken)
+            finish()
+            return true
+        }
+        return false
+    }
+
+    private fun trySavedToken(prefs: SharedPreferences): Boolean {
+        if (prefs.contains(PREF_ACCESS_TOKEN)) {
+            MainActivity.start(this, prefs.getString(PREF_ACCESS_TOKEN, null))
+            finish()
+            return true
+        }
+        return false
     }
 }
