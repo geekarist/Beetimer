@@ -18,6 +18,10 @@ class GoalAdapter: RecyclerView.Adapter<GoalViewHolder>() {
         return GoalViewHolder(itemView)
     }
 
+    override fun onViewRecycled(holder: GoalViewHolder?) {
+        holder?.release()
+    }
+
     override fun getItemCount(): Int = items.size
 
     fun addAll(items: List<Goal>) {

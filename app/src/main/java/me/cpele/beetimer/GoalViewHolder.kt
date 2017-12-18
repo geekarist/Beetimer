@@ -1,6 +1,7 @@
 package me.cpele.beetimer
 
 import android.content.Context
+import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import kotlinx.android.synthetic.main.view_item.view.*
@@ -11,11 +12,27 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
     private val mContext: Context
         get() = itemView.context
 
+    private lateinit var stopWatch: StopWatch
+
+    private var handler: Handler? = null
+    private var runnable: Runnable? = null
+
     fun bind(goal: Goal) {
         itemView.item_id.text = goal.slug
         itemView.item_title.text = goal.title
         itemView.item_rate.text = mContext.getString(R.string.item_rate, goal.rate, goal.runits)
         itemView.item_bare_min.text = goal.limsum
+
+        stopWatch = StopWatch()
+        itemView.item_timer.setOnClickListener { stopWatch.toggle() }
+        handler = Handler()
+        runnable = object: Runnable {
+            override fun run() {
+                itemView.item_timer.text = stopWatch.elapsedMillis().toString()
+                handler?.postDelayed(this, 1000)
+            }
+        }
+        handler?.post(runnable)
 
         @Suppress("DEPRECATION")
         goal.losedate?.let {
@@ -49,5 +66,9 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
             itemView.item_derail_time.setBackgroundColor(mContext.resources.getColor(color))
         }
+    }
+
+    fun release() {
+        handler?.removeCallbacks(runnable)
     }
 }
