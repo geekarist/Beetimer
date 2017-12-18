@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.let {
-                    mAdapter.addAll(it)
+                    mAdapter.refresh(it)
                     changeSyncStatus(SyncStatus.SUCCESS)
                     displaySyncStatus()
                     main_vf.displayedChild = CHILD_GOALS
