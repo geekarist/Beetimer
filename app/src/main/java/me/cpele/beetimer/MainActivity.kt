@@ -1,6 +1,7 @@
 package me.cpele.beetimer
 
 import android.annotation.SuppressLint
+import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,6 +28,10 @@ class MainActivity : AppCompatActivity() {
     private var mMenu: Menu? = null
     private lateinit var mStatus: SyncStatus
 
+    private lateinit var database: CustomDatabase
+    private lateinit var userDao: UserDao
+    private lateinit var goalDao: GoalDao
+
     private enum class SyncStatus {
         SUCCESS, LOADING, FAILURE
     }
@@ -43,6 +48,10 @@ class MainActivity : AppCompatActivity() {
         Log.d(localClassName, "onCreate")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        database = Room.databaseBuilder(this, CustomDatabase::class.java, packageName).build()
+        userDao = database.userDao()
+        goalDao = database.goalDao()
 
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
@@ -87,7 +96,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeSyncStatus(status: SyncStatus) {
-        Log.d(localClassName, "Setting status to: ${status}")
+        Log.d(localClassName, "Setting status to: $status")
         mStatus = status
     }
 
@@ -102,8 +111,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
-                response?.body()?.username?.let {
-                    fetchGoals(accessToken, it)
+                response?.body()?.apply {
+                    userDao.insertOrUpdate(this)
+                    fetchGoals(accessToken, username)
                 }
             }
         })
@@ -120,8 +130,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
-                response?.body()?.let {
-                    mAdapter.refresh(it)
+                response?.body()?.apply {
+                    goalDao.insertOrUpdate(this)
+                    mAdapter.refresh(this)
                     changeSyncStatus(SyncStatus.SUCCESS)
                     displaySyncStatus()
                     main_vf.displayedChild = CHILD_GOALS
@@ -160,3 +171,4 @@ class MainActivity : AppCompatActivity() {
         item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
     }
 }
+
