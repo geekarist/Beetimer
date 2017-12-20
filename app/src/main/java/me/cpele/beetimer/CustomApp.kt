@@ -33,4 +33,9 @@ class CustomApp : Application() {
                 .build()
         retrofit.create(BeeminderApi::class.java)
     }
+
+    val beeRepository: BeeRepository by lazy {
+        BeeRepository(this, AppExecutors().disk)
+    }
 }
+

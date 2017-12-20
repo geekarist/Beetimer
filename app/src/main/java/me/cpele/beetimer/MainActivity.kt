@@ -1,7 +1,6 @@
 package me.cpele.beetimer
 
 import android.annotation.SuppressLint
-import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,9 +27,7 @@ class MainActivity : AppCompatActivity() {
     private var mMenu: Menu? = null
     private lateinit var mStatus: SyncStatus
 
-    private lateinit var database: CustomDatabase
-    private lateinit var userDao: UserDao
-    private lateinit var goalDao: GoalDao
+    private lateinit var repository: BeeRepository
 
     private enum class SyncStatus {
         SUCCESS, LOADING, FAILURE
@@ -49,9 +46,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        database = Room.databaseBuilder(this, CustomDatabase::class.java, packageName).build()
-        userDao = database.userDao()
-        goalDao = database.goalDao()
+        repository = CustomApp.instance.beeRepository
 
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
@@ -112,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
-                    userDao.insertOrUpdate(this)
+                    repository.insertOrUpdateUser(this)
                     fetchGoals(accessToken, username)
                 }
             }
@@ -131,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
-                    goalDao.insertOrUpdate(this)
+                    repository.insertOrUpdateGoals(this)
                     mAdapter.refresh(this)
                     changeSyncStatus(SyncStatus.SUCCESS)
                     displaySyncStatus()
