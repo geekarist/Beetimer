@@ -1,6 +1,8 @@
 package me.cpele.beetimer.ui
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,15 +12,12 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import me.cpele.beetimer.BeeRepository
-import me.cpele.beetimer.R
-import me.cpele.beetimer.api.Goal
-import me.cpele.beetimer.api.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import me.cpele.beetimer.*
+import me.cpele.beetimer.repository.BeeRepository
+import me.cpele.beetimer.repository.LoadingErrorEvent
+import me.cpele.beetimer.repository.LoadingInProgressEvent
+import me.cpele.beetimer.repository.LoadingSuccessEvent
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 private const val CHILD_LOADING = 0
@@ -33,6 +32,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var repository: BeeRepository
 
+    private val extraAuthToken
+        get() = intent.getStringExtra(ARG_ACCESS_TOKEN)
+
     private enum class SyncStatus {
         SUCCESS, LOADING, FAILURE
     }
@@ -45,6 +47,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val viewModel: MainViewModel
+        get() = ViewModelProviders
+                .of(this, MainViewModel.Factory(repository, extraAuthToken))
+                .get(MainViewModel::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(localClassName, "onCreate")
         super.onCreate(savedInstanceState)
@@ -55,7 +62,27 @@ class MainActivity : AppCompatActivity() {
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
 
-        initiateFetch()
+        changeSyncStatus(SyncStatus.LOADING)
+        displaySyncStatus()
+
+        viewModel.loadingInProgressEvent.observe(this, Observer<LoadingInProgressEvent> {
+            changeSyncStatus(SyncStatus.LOADING)
+            displaySyncStatus()
+            if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
+        })
+
+        viewModel.loadingErrorEvent.observe(this, Observer<LoadingErrorEvent> {
+            changeSyncStatus(SyncStatus.FAILURE)
+            displaySyncStatus()
+            if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
+        })
+
+        viewModel.loadingSuccessEvent.observe(this, Observer<LoadingSuccessEvent> {
+            changeSyncStatus(SyncStatus.SUCCESS)
+            displaySyncStatus()
+            main_vf.displayedChild = CHILD_GOALS
+            it?.apply { mAdapter.refresh(it.goals) }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -80,64 +107,16 @@ class MainActivity : AppCompatActivity() {
         Log.d(localClassName, "onOptionsItemSelected")
         return when (item?.itemId) {
             R.id.main_menu_sync -> {
-                initiateFetch()
+                viewModel.refresh()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun initiateFetch() {
-        changeSyncStatus(SyncStatus.LOADING)
-        displaySyncStatus()
-        if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
-        fetchUser(intent.getStringExtra(ARG_ACCESS_TOKEN))
-    }
-
     private fun changeSyncStatus(status: SyncStatus) {
         Log.d(localClassName, "Setting status to: $status")
         mStatus = status
-    }
-
-    private fun fetchUser(accessToken: String) {
-
-        CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
-            override fun onFailure(call: Call<User>?, t: Throwable?) {
-                Toast.makeText(this@MainActivity, "Error retrieving user: ${t.toString()}", Toast.LENGTH_LONG).show()
-                changeSyncStatus(SyncStatus.FAILURE)
-                displaySyncStatus()
-                if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
-            }
-
-            override fun onResponse(call: Call<User>?, response: Response<User>?) {
-                response?.body()?.apply {
-                    repository.insertOrUpdateUser(this)
-                    fetchGoals(accessToken, username)
-                }
-            }
-        })
-    }
-
-    private fun fetchGoals(accessToken: String, user: String) {
-
-        CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
-            override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
-                Toast.makeText(this@MainActivity, "Error retrieving goals: ${t.toString()}", Toast.LENGTH_LONG).show()
-                changeSyncStatus(SyncStatus.FAILURE)
-                displaySyncStatus()
-                if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
-            }
-
-            override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
-                response?.body()?.apply {
-                    repository.insertOrUpdateGoals(this)
-                    mAdapter.refresh(this)
-                    changeSyncStatus(SyncStatus.SUCCESS)
-                    displaySyncStatus()
-                    main_vf.displayedChild = CHILD_GOALS
-                }
-            }
-        })
     }
 
     @SuppressLint("InflateParams")

@@ -1,0 +1,30 @@
+package me.cpele.beetimer.ui
+
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
+import me.cpele.beetimer.repository.BeeRepository
+
+class MainViewModel(
+        private val repository: BeeRepository,
+        private val authToken: String?
+) : ViewModel() {
+
+    var loadingInProgressEvent = repository.loadingInProgressEvent
+    var loadingErrorEvent = repository.loadingErrorEvent
+    var loadingSuccessEvent = repository.loadingSuccessEvent
+
+    init {
+        refresh()
+    }
+
+    fun refresh() = repository.fetch(authToken)
+
+    class Factory(
+            private val repository: BeeRepository,
+            private val authToken: String?
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+                modelClass.cast(MainViewModel(repository, authToken))
+    }
+}
+
