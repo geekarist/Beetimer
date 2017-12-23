@@ -1,6 +1,5 @@
 package me.cpele.beetimer.repository
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.persistence.room.Room
 import android.content.Context
 import me.cpele.beetimer.api.Goal
@@ -23,9 +22,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
     private val userDao: UserDao
     private val goalDao: GoalDao
 
-    val loadingInProgressEvent = MutableLiveData<LoadingInProgressEvent>()
-    val loadingErrorEvent = MutableLiveData<LoadingErrorEvent>()
-    val loadingSuccessEvent = MutableLiveData<LoadingSuccessEvent>()
+    val loadingInProgressEvent = SingleLiveEvent<LoadingInProgressEvent>()
+    val loadingErrorEvent = SingleLiveEvent<LoadingErrorEvent>()
+    val loadingSuccessEvent = SingleLiveEvent<LoadingSuccessEvent>()
 
     init {
         userDao = database.userDao()
@@ -38,11 +37,11 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private fun fetchUser(accessToken: String) {
 
-        loadingInProgressEvent.value = LoadingInProgressEvent()
+        loadingInProgressEvent.setValue(LoadingInProgressEvent())
 
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
-                loadingErrorEvent.value = LoadingErrorEvent("Error loading user", t)
+                loadingErrorEvent.setValue(LoadingErrorEvent("Error loading user", t))
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
@@ -58,15 +57,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
-                loadingErrorEvent.value = LoadingErrorEvent("Error loading goals", t)
+                loadingErrorEvent.setValue(LoadingErrorEvent("Error loading goals", t))
             }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
                     insertOrUpdateGoals(this)
-                    loadingSuccessEvent.value = LoadingSuccessEvent(this)
+                    loadingSuccessEvent.setValue(LoadingSuccessEvent(this))
                 }
             }
         })
     }
 }
+
