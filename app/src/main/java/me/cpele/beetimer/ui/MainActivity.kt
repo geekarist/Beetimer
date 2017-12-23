@@ -13,11 +13,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
-import me.cpele.beetimer.*
+import me.cpele.beetimer.R
 import me.cpele.beetimer.repository.BeeRepository
-import me.cpele.beetimer.repository.LoadingErrorEvent
-import me.cpele.beetimer.repository.LoadingInProgressEvent
-import me.cpele.beetimer.repository.LoadingSuccessEvent
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 private const val CHILD_LOADING = 0
@@ -62,22 +59,19 @@ class MainActivity : AppCompatActivity() {
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
 
-        changeSyncStatus(SyncStatus.LOADING)
-        displaySyncStatus()
-
-        viewModel.loadingInProgressEvent.observe(this, Observer<LoadingInProgressEvent> {
+        viewModel.loadingInProgressEvent.observe(this, Observer {
             changeSyncStatus(SyncStatus.LOADING)
             displaySyncStatus()
             if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
         })
 
-        viewModel.loadingErrorEvent.observe(this, Observer<LoadingErrorEvent> {
+        viewModel.loadingErrorEvent.observe(this, Observer {
             changeSyncStatus(SyncStatus.FAILURE)
             displaySyncStatus()
             if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
         })
 
-        viewModel.loadingSuccessEvent.observe(this, Observer<LoadingSuccessEvent> {
+        viewModel.loadingSuccessEvent.observe(this, Observer {
             changeSyncStatus(SyncStatus.SUCCESS)
             displaySyncStatus()
             main_vf.displayedChild = CHILD_GOALS
@@ -90,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
         mMenu = menu
-        displaySyncStatus()
+        viewModel.refresh()
         return displayMenu
     }
 
