@@ -1,8 +1,10 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.ui
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import me.cpele.beetimer.R
+import me.cpele.beetimer.api.Goal
 
 class GoalAdapter: RecyclerView.Adapter<GoalViewHolder>() {
 

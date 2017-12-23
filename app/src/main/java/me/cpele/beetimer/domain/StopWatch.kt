@@ -1,4 +1,4 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.domain
 
 import java.util.concurrent.TimeUnit
 

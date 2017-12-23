@@ -1,6 +1,10 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.ui
 
 import android.app.Application
+import me.cpele.beetimer.AppExecutors
+import me.cpele.beetimer.BeeRepository
+import me.cpele.beetimer.BuildConfig
+import me.cpele.beetimer.api.BeeminderApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

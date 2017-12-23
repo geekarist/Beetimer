@@ -1,4 +1,4 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,6 +12,10 @@ import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import me.cpele.beetimer.BeeRepository
+import me.cpele.beetimer.R
+import me.cpele.beetimer.api.Goal
+import me.cpele.beetimer.api.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

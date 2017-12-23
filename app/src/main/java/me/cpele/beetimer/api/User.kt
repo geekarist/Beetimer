@@ -1,4 +1,4 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.api
 
 import android.arch.persistence.room.Embedded
 import android.arch.persistence.room.Entity

@@ -2,6 +2,11 @@ package me.cpele.beetimer
 
 import android.arch.persistence.room.Room
 import android.content.Context
+import me.cpele.beetimer.api.Goal
+import me.cpele.beetimer.api.User
+import me.cpele.beetimer.database.CustomDatabase
+import me.cpele.beetimer.database.GoalDao
+import me.cpele.beetimer.database.UserDao
 import java.util.concurrent.Executor
 
 class BeeRepository(context: Context, private val executor: Executor) {

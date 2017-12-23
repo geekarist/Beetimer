@@ -1,4 +1,4 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.ui
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_sign_in.*
+import me.cpele.beetimer.R
 
 private const val BMNDR_CLIENT_ID = "30zxgk213ellu3dj730wto3qj"
 private const val BMNDR_REDIRECT_URI = "beetimer://auth_callback"
@@ -32,7 +33,7 @@ class SignInActivity : AppCompatActivity() {
         val signInButton = sign_in_bt
         signInButton.setOnClickListener {
             val uri = Uri.parse("https://www.beeminder.com/apps/authorize?" +
-                    "client_id=$BMNDR_CLIENT_ID&redirect_uri=$BMNDR_REDIRECT_URI&response_type=token")
+                    "client_id=${BMNDR_CLIENT_ID}&redirect_uri=${BMNDR_REDIRECT_URI}&response_type=token")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
         }

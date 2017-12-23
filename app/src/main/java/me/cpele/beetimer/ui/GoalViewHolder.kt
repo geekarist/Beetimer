@@ -1,10 +1,13 @@
-package me.cpele.beetimer
+package me.cpele.beetimer.ui
 
 import android.content.Context
 import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import kotlinx.android.synthetic.main.view_item.view.*
+import me.cpele.beetimer.R
+import me.cpele.beetimer.api.Goal
+import me.cpele.beetimer.domain.StopWatch
 import java.util.concurrent.TimeUnit
 
 class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
