@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(localClassName, "Activity received status: $it")
             val childToDisplay = it?.displayedChild ?: MainViewModel.Status.LOADING.displayedChild
             main_vf.displayedChild = childToDisplay
+            triggerSyncStatus(it ?: MainViewModel.Status.LOADING)
         })
 
         viewModel.goals.observe(this, Observer {
@@ -72,13 +73,11 @@ class MainActivity : AppCompatActivity() {
         return displayMenu
     }
 
-//    private fun displaySyncStatus() {
-//        when (mStatus) {
-//            SyncStatus.SUCCESS -> succeedSyncAnim()
-//            SyncStatus.LOADING -> startSyncAnim()
-//            SyncStatus.FAILURE -> failSyncAnim()
-//        }
-//    }
+    private fun triggerSyncStatus(status: MainViewModel.Status) = when (status) {
+        MainViewModel.Status.SUCCESS -> succeedSyncAnim()
+        MainViewModel.Status.LOADING -> startSyncAnim()
+        MainViewModel.Status.FAILURE -> failSyncAnim()
+    }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
@@ -91,11 +90,6 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-//    private fun changeSyncStatus(status: SyncStatus) {
-//        Log.d(localClassName, "Setting status to: $status")
-//        mStatus = status
-//    }
 
     @SuppressLint("InflateParams")
     private fun startSyncAnim() {
