@@ -17,24 +17,16 @@ import me.cpele.beetimer.R
 import me.cpele.beetimer.repository.BeeRepository
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
-private const val CHILD_LOADING = 0
-private const val CHILD_GOALS = 1
-private const val CHILD_ERROR = 2
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mAdapter: GoalAdapter
     private var mMenu: Menu? = null
-    private lateinit var mStatus: SyncStatus
 
     private lateinit var repository: BeeRepository
 
     private val extraAuthToken
         get() = intent.getStringExtra(ARG_ACCESS_TOKEN)
-
-    private enum class SyncStatus {
-        SUCCESS, LOADING, FAILURE
-    }
 
     companion object {
         fun start(context: Context, token: String) {
@@ -59,23 +51,15 @@ class MainActivity : AppCompatActivity() {
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
 
-        viewModel.loadingInProgressEvent.observe(this, Observer {
-            changeSyncStatus(SyncStatus.LOADING)
-            displaySyncStatus()
-            if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_LOADING
+        viewModel.status.observe(this, Observer {
+            Log.d(localClassName, "Activity received status: $it")
+            val childToDisplay = it?.displayedChild ?: MainViewModel.Status.LOADING.displayedChild
+            main_vf.displayedChild = childToDisplay
         })
 
-        viewModel.loadingErrorEvent.observe(this, Observer {
-            changeSyncStatus(SyncStatus.FAILURE)
-            displaySyncStatus()
-            if (mAdapter.isEmpty()) main_vf.displayedChild = CHILD_ERROR
-        })
-
-        viewModel.loadingSuccessEvent.observe(this, Observer {
-            changeSyncStatus(SyncStatus.SUCCESS)
-            displaySyncStatus()
-            main_vf.displayedChild = CHILD_GOALS
-            it?.apply { mAdapter.refresh(it.goals) }
+        viewModel.goals.observe(this, Observer {
+            Log.d(localClassName, "Activity received goals: $it")
+            mAdapter.refresh(it ?: emptyList())
         })
     }
 
@@ -88,13 +72,13 @@ class MainActivity : AppCompatActivity() {
         return displayMenu
     }
 
-    private fun displaySyncStatus() {
-        when (mStatus) {
-            SyncStatus.SUCCESS -> succeedSyncAnim()
-            SyncStatus.LOADING -> startSyncAnim()
-            SyncStatus.FAILURE -> failSyncAnim()
-        }
-    }
+//    private fun displaySyncStatus() {
+//        when (mStatus) {
+//            SyncStatus.SUCCESS -> succeedSyncAnim()
+//            SyncStatus.LOADING -> startSyncAnim()
+//            SyncStatus.FAILURE -> failSyncAnim()
+//        }
+//    }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
@@ -108,10 +92,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeSyncStatus(status: SyncStatus) {
-        Log.d(localClassName, "Setting status to: $status")
-        mStatus = status
-    }
+//    private fun changeSyncStatus(status: SyncStatus) {
+//        Log.d(localClassName, "Setting status to: $status")
+//        mStatus = status
+//    }
 
     @SuppressLint("InflateParams")
     private fun startSyncAnim() {
