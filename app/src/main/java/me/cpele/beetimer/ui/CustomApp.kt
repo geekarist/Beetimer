@@ -22,6 +22,8 @@ class CustomApp : Application() {
         lateinit var instance: CustomApp private set
     }
 
+    val executors = AppExecutors()
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -30,7 +32,8 @@ class CustomApp : Application() {
                 getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         val componentName = ComponentName(this, BeeJobService::class.java)
         val jobInfo = JobInfo.Builder(0, componentName)
-                .setPeriodic(TimeUnit.MINUTES.toMillis(1))
+                .setPeriodic(TimeUnit.HOURS.toMillis(1))
+                .setMinimumLatency(0)
                 .build()
         jobScheduler.schedule(jobInfo)
         Log.d(javaClass.simpleName, "Job scheduled")
@@ -54,7 +57,7 @@ class CustomApp : Application() {
     }
 
     val beeRepository: BeeRepository by lazy {
-        BeeRepository(this, AppExecutors().disk)
+        BeeRepository(this, executors.disk)
     }
 }
 
