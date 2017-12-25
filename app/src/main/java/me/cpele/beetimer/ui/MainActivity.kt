@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.beetimer.R
+import me.cpele.beetimer.domain.Status
 import me.cpele.beetimer.repository.BeeRepository
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
-            triggerSyncStatus(it ?: MainViewModel.Status.LOADING)
+            triggerSyncStatus(it?.status ?: Status.LOADING)
         })
 
         viewModel.goals.observe(this, Observer {
@@ -69,14 +70,14 @@ class MainActivity : AppCompatActivity() {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
         mMenu = menu
-        viewModel.status.value?.apply { triggerSyncStatus(this) }
+        viewModel.status.value?.apply { triggerSyncStatus(this.status) }
         return displayMenu
     }
 
-    private fun triggerSyncStatus(status: MainViewModel.Status) = when (status) {
-        MainViewModel.Status.SUCCESS -> succeedSyncAnim()
-        MainViewModel.Status.LOADING -> startSyncAnim()
-        MainViewModel.Status.FAILURE -> failSyncAnim()
+    private fun triggerSyncStatus(status: Status) = when (status) {
+        Status.SUCCESS -> succeedSyncAnim()
+        Status.LOADING -> startSyncAnim()
+        Status.FAILURE -> failSyncAnim()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
