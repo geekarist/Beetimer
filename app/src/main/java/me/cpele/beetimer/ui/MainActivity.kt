@@ -51,6 +51,8 @@ class MainActivity : AppCompatActivity() {
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
 
+        if (savedInstanceState == null) viewModel.refresh()
+
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
             triggerSyncStatus(it ?: MainViewModel.Status.LOADING)
@@ -67,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
         mMenu = menu
-        viewModel.refresh()
+        viewModel.status.value?.apply { triggerSyncStatus(this) }
         return displayMenu
     }
 

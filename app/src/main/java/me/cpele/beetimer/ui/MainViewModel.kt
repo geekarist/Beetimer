@@ -23,7 +23,6 @@ class MainViewModel(
             status.addSource(loadingSuccessEvent) { status.value = Status.SUCCESS }
             status.addSource(loadingErrorEvent) { status.value = Status.FAILURE }
             status.addSource(loadingInProgressEvent) { status.value = Status.LOADING }
-
             goals.addSource(loadingSuccessEvent) { goals.value = it?.goals ?: emptyList() }
         }
     }
