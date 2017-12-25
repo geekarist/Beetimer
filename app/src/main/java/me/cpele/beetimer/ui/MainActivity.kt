@@ -53,8 +53,6 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
-            val childToDisplay = it?.displayedChild ?: MainViewModel.Status.LOADING.displayedChild
-            main_vf.displayedChild = childToDisplay
             triggerSyncStatus(it ?: MainViewModel.Status.LOADING)
         })
 

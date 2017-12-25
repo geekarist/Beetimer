@@ -25,8 +25,6 @@ class MainViewModel(
             status.addSource(loadingInProgressEvent) { status.value = Status.LOADING }
 
             goals.addSource(loadingSuccessEvent) { goals.value = it?.goals ?: emptyList() }
-            goals.addSource(loadingInProgressEvent) { goals.value = emptyList() }
-            goals.addSource(loadingErrorEvent) { goals.value = emptyList() }
         }
     }
 
