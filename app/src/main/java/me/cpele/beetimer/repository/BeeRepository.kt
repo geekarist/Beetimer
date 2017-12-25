@@ -5,8 +5,12 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import me.cpele.beetimer.api.Goal
 import me.cpele.beetimer.api.User
-import me.cpele.beetimer.database.*
+import me.cpele.beetimer.database.CustomDatabase
+import me.cpele.beetimer.database.dao.GoalDao
+import me.cpele.beetimer.database.dao.StatusChangeDao
+import me.cpele.beetimer.database.dao.UserDao
 import me.cpele.beetimer.domain.Status
+import me.cpele.beetimer.domain.StatusChange
 import me.cpele.beetimer.ui.CustomApp
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,30 +25,29 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val userDao: UserDao = database.userDao()
     private val goalDao: GoalDao = database.goalDao()
-    private val statusDao: StatusDao = database.statusDao()
+    private val statusChangeDao: StatusChangeDao = database.statusDao()
 
-    val latestStatus: LiveData<StatusContainer> = statusDao.findLatestStatus()
+    val latestStatus: LiveData<StatusChange> = statusChangeDao.findLatestStatus()
     val goals: LiveData<List<Goal>> = goalDao.findAllGoals()
 
-    private fun insertOrUpdateUser(user: User) = executor.execute { userDao.insertOrUpdate(user) }
-    private fun insertOrUpdateGoals(list: List<Goal>) = executor.execute { goalDao.insertOrUpdate(list) }
-    private fun updateLatestStatus(status: StatusContainer) =
-            executor.execute { statusDao.updateLatestStatus(status) }
+    private fun insertUser(user: User) = executor.execute { userDao.insert(user) }
+    private fun insertGoals(list: List<Goal>) = executor.execute { goalDao.insert(list) }
+    private fun insertStatusChange(status: StatusChange) =
+            executor.execute { statusChangeDao.insert(status) }
 
     fun fetch(authToken: String?) = authToken?.apply { fetchUser(this) }
 
     private fun fetchUser(accessToken: String) {
 
-        updateLatestStatus(StatusContainer(Status.LOADING))
+        insertStatusChange(StatusChange(status = Status.LOADING))
 
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
-            override fun onFailure(call: Call<User>?, t: Throwable?) {
-                updateLatestStatus(StatusContainer(Status.failure("Error loading user", t)))
-            }
+            override fun onFailure(call: Call<User>?, t: Throwable?) =
+                insertStatusChange(StatusChange(status = Status.failure("Error loading user", t)))
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
-                    insertOrUpdateUser(this)
+                    insertUser(this)
                     fetchGoals(accessToken, username)
                 }
             }
@@ -54,14 +57,13 @@ class BeeRepository(context: Context, private val executor: Executor) {
     private fun fetchGoals(accessToken: String, user: String) {
 
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
-            override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
-                updateLatestStatus(StatusContainer(Status.failure("Error loading goals", t)))
-            }
+            override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) =
+                insertStatusChange(StatusChange(status = Status.failure("Error loading goals", t)))
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
-                    insertOrUpdateGoals(this)
-                    updateLatestStatus(StatusContainer(Status.SUCCESS))
+                    insertGoals(this)
+                    insertStatusChange(StatusChange(status = Status.SUCCESS))
                 }
             }
         })

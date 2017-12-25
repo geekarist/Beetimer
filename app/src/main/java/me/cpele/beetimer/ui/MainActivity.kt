@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity() {
         val displayMenu = super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_options_menu, menu)
         mMenu = menu
-        viewModel.status.value?.apply { triggerSyncStatus(this.status) }
         return displayMenu
     }
 

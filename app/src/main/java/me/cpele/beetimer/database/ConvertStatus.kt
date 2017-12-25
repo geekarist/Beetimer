@@ -3,7 +3,7 @@ package me.cpele.beetimer.database
 import android.arch.persistence.room.TypeConverter
 import me.cpele.beetimer.domain.Status
 
-class StatusConversion {
+class ConvertStatus {
 
     @TypeConverter
     fun toInteger(status: Status): Int {

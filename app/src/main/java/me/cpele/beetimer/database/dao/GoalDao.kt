@@ -1,4 +1,4 @@
-package me.cpele.beetimer.database
+package me.cpele.beetimer.database.dao
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
@@ -10,7 +10,7 @@ import me.cpele.beetimer.api.Goal
 @Dao
 interface GoalDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(list: List<Goal>)
+    fun insert(list: List<Goal>)
 
     @Query("SELECT * FROM goal")
     fun findAllGoals(): LiveData<List<Goal>>
