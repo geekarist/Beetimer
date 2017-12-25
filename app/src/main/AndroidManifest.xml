@@ -44,6 +44,10 @@
 
         </activity>
 
+        <service
+            android:name=".ui.BeeJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            />
     </application>
 
 </manifest>
