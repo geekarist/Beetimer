@@ -24,8 +24,6 @@ class CustomApp : Application() {
         instance = this
 
         executors = AppExecutors()
-
-        sendBroadcast(BeeJobReceiver.CustomIntent())
     }
 
     val api: BeeminderApi by lazy {
