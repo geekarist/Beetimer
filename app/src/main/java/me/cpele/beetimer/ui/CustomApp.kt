@@ -1,11 +1,6 @@
 package me.cpele.beetimer.ui
 
 import android.app.Application
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
-import android.content.Context
-import android.util.Log
 import me.cpele.beetimer.AppExecutors
 import me.cpele.beetimer.BuildConfig
 import me.cpele.beetimer.api.BeeminderApi
@@ -14,29 +9,23 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
 class CustomApp : Application() {
 
+    private lateinit var executors: AppExecutors
+
     companion object {
         lateinit var instance: CustomApp private set
-    }
 
-    val executors = AppExecutors()
+    }
 
     override fun onCreate() {
         super.onCreate()
         instance = this
 
-        val jobScheduler: JobScheduler =
-                getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        val componentName = ComponentName(this, BeeJobService::class.java)
-        val jobInfo = JobInfo.Builder(0, componentName)
-                .setPeriodic(TimeUnit.HOURS.toMillis(1))
-                .setMinimumLatency(0)
-                .build()
-        jobScheduler.schedule(jobInfo)
-        Log.d(javaClass.simpleName, "Job scheduled")
+        executors = AppExecutors()
+
+        sendBroadcast(BeeJobReceiver.CustomIntent())
     }
 
     val api: BeeminderApi by lazy {
