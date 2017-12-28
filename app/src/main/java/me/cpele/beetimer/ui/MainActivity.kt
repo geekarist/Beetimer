@@ -56,6 +56,13 @@ class MainActivity : AppCompatActivity() {
             viewModel.refresh()
             sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        Log.d(localClassName, "onCreateOptionsMenu")
+        val displayMenu = super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.main_options_menu, menu)
+        mMenu = menu
 
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
@@ -66,13 +73,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(localClassName, "Activity received goals: $it")
             mAdapter.refresh(it ?: emptyList())
         })
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        Log.d(localClassName, "onCreateOptionsMenu")
-        val displayMenu = super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.main_options_menu, menu)
-        mMenu = menu
         return displayMenu
     }
 
