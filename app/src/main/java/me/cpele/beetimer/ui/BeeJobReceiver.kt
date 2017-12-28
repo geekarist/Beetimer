@@ -3,7 +3,6 @@ package me.cpele.beetimer.ui
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.*
-import android.os.PersistableBundle
 import android.preference.PreferenceManager
 import android.util.Log
 import java.util.concurrent.TimeUnit
@@ -22,7 +21,9 @@ class BeeJobReceiver : BroadcastReceiver() {
                         this.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
                 val componentName = ComponentName(this, BeeJobService::class.java)
 
-                val persistableBundle = newBeeJobServiceBundle(context, intent)
+                val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+                val extraAuthToken = obtainAuthToken(intent, preferences)
+                val persistableBundle = BeeJobService.newBundle(extraAuthToken)
 
                 val jobInfo = JobInfo.Builder(0, componentName)
                         .setPeriodic(TimeUnit.HOURS.toMillis(1))
@@ -33,15 +34,6 @@ class BeeJobReceiver : BroadcastReceiver() {
                 Log.d(BeeJobReceiver::class.java.simpleName, "Job scheduled")
             }
         }
-    }
-
-    // TODO move to BeeJobService somehow
-    private fun newBeeJobServiceBundle(context: Context?, intent: Intent?): PersistableBundle {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val persistableBundle = PersistableBundle()
-        val extraAuthToken = obtainAuthToken(intent, preferences)
-        persistableBundle.putString(CustomIntent.EXTRA_AUTH_TOKEN, extraAuthToken)
-        return persistableBundle
     }
 
     private fun obtainAuthToken(intent: Intent?, preferences: SharedPreferences) =
