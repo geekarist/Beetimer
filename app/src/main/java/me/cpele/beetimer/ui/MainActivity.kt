@@ -52,7 +52,10 @@ class MainActivity : AppCompatActivity() {
         mAdapter = GoalAdapter()
         main_rv.adapter = mAdapter
 
-        if (savedInstanceState == null) viewModel.refresh()
+        if (savedInstanceState == null) {
+            viewModel.refresh()
+            sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
+        }
 
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
@@ -77,12 +80,6 @@ class MainActivity : AppCompatActivity() {
         Status.SUCCESS -> succeedSyncAnim()
         Status.LOADING -> startSyncAnim()
         Status.FAILURE -> failSyncAnim()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
