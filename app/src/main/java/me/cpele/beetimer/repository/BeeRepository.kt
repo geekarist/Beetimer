@@ -30,40 +30,61 @@ class BeeRepository(context: Context, private val executor: Executor) {
     val latestStatus: LiveData<StatusChange> = statusChangeDao.findLatestStatus()
     val goals: LiveData<List<Goal>> = goalDao.findAllGoals()
 
-    private fun insertUser(user: User) = executor.execute { userDao.insert(user) }
-    private fun insertGoals(list: List<Goal>) = executor.execute { goalDao.insert(list) }
-    private fun insertStatusChange(status: StatusChange) =
-            executor.execute { statusChangeDao.insert(status) }
+    private fun insertUser(user: User, callback: () -> Unit = {}) =
+            executor.execute {
+                userDao.insert(user)
+                callback()
+            }
 
-    fun fetch(authToken: String?) = authToken?.apply { fetchUser(this) }
+    private fun insertGoals(list: List<Goal>, callback: () -> Unit = {}) =
+            executor.execute {
+                goalDao.insert(list)
+                callback()
+            }
 
-    private fun fetchUser(accessToken: String) {
+    private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) =
+            executor.execute {
+                statusChangeDao.insert(status)
+                callback()
+            }
+
+    fun fetch(authToken: String?, callback: () -> Unit = {}) = authToken?.apply { fetchUser(this, callback) }
+
+    private fun fetchUser(accessToken: String, callback: () -> Unit) {
 
         insertStatusChange(StatusChange(status = Status.LOADING))
 
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
-            override fun onFailure(call: Call<User>?, t: Throwable?) =
-                insertStatusChange(StatusChange(status = Status.failure("Error loading user", t)))
+            override fun onFailure(call: Call<User>?, t: Throwable?) {
+                insertStatusChange(
+                        StatusChange(status = Status.failure("Error loading user", t)),
+                        callback)
+            }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
-                    insertUser(this)
-                    fetchGoals(accessToken, username)
+                    insertUser(this) {
+                        fetchGoals(accessToken, username, callback)
+                    }
                 }
             }
         })
     }
 
-    private fun fetchGoals(accessToken: String, user: String) {
+    private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit) {
 
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
-            override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) =
-                insertStatusChange(StatusChange(status = Status.failure("Error loading goals", t)))
+            override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
+                insertStatusChange(
+                        StatusChange(status = Status.failure("Error loading goals", t)),
+                        callback)
+            }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
-                    insertGoals(this)
-                    insertStatusChange(StatusChange(status = Status.SUCCESS))
+                    insertGoals(this) {
+                        insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
+                    }
                 }
             }
         })

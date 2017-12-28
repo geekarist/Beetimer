@@ -13,6 +13,10 @@ class BeeJobService : JobService() {
 
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.d(javaClass.simpleName, "Start job")
-        return false
+        val extraName = BeeJobReceiver.CustomIntent.EXTRA_AUTH_TOKEN
+        val authToken: String = params?.extras?.getString(extraName)
+                ?: throw IllegalStateException("Intent should have EXTRA_AUTH_TOKEN")
+        CustomApp.instance.beeRepository.fetch(authToken) { jobFinished(params, false) }
+        return true
     }
 }

@@ -79,6 +79,12 @@ class MainActivity : AppCompatActivity() {
         Status.FAILURE -> failSyncAnim()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
         Log.d(localClassName, "onOptionsItemSelected")
