@@ -27,7 +27,6 @@ class BeeJobReceiver : BroadcastReceiver() {
                 val jobInfo = JobInfo.Builder(0, componentName)
                         .setPeriodic(TimeUnit.HOURS.toMillis(1))
                         .setExtras(persistableBundle)
-                        .setMinimumLatency(0)
                         .setPersisted(true)
                         .build()
                 jobScheduler.schedule(jobInfo)
