@@ -11,9 +11,12 @@ import me.cpele.beetimer.R
 
 private const val BMNDR_CLIENT_ID = "30zxgk213ellu3dj730wto3qj"
 private const val BMNDR_REDIRECT_URI = "beetimer://auth_callback"
-private const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
 
 class SignInActivity : AppCompatActivity() {
+
+    companion object {
+        const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
