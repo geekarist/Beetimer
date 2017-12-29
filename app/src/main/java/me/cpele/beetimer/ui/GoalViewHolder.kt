@@ -29,11 +29,9 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         stopWatch = StopWatch()
         itemView.item_timer.setOnClickListener { stopWatch.toggle() }
         handler = Handler()
-        runnable = object : Runnable {
-            override fun run() {
-                itemView.item_timer.text = stopWatch.format()
-                handler.postDelayed(this, 200)
-            }
+        runnable = Runnable {
+            itemView.item_timer.text = stopWatch.format()
+            handler.postDelayed(runnable, 200)
         }
         handler.post(runnable)
 
