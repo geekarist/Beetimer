@@ -2,7 +2,7 @@ package me.cpele.beetimer.domain
 
 import java.util.concurrent.TimeUnit
 
-class StopWatch {
+class Stopwatch {
 
     private var startTime: Long = 0
     private var stopTime: Long = 0

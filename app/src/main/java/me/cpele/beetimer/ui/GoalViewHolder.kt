@@ -7,7 +7,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.view_item.view.*
 import me.cpele.beetimer.R
 import me.cpele.beetimer.api.Goal
-import me.cpele.beetimer.domain.StopWatch
+import me.cpele.beetimer.domain.Stopwatch
 import java.util.concurrent.TimeUnit
 
 class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
@@ -15,7 +15,7 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
     private val context: Context
         get() = itemView.context
 
-    private lateinit var stopWatch: StopWatch
+    private lateinit var stopwatch: Stopwatch
 
     private lateinit var handler: Handler
     private lateinit var runnable: Runnable
@@ -26,11 +26,11 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         itemView.item_rate.text = context.getString(R.string.item_rate, goal.rate, goal.runits)
         itemView.item_bare_min.text = goal.limsum
 
-        stopWatch = StopWatch()
-        itemView.item_timer.setOnClickListener { stopWatch.toggle() }
+        stopwatch = Stopwatch()
+        itemView.item_timer.setOnClickListener { stopwatch.toggle() }
         handler = Handler()
         runnable = Runnable {
-            itemView.item_timer.text = stopWatch.format()
+            itemView.item_timer.text = stopwatch.format()
             handler.postDelayed(runnable, 200)
         }
         handler.post(runnable)
