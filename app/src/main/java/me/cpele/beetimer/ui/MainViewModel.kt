@@ -3,7 +3,7 @@ package me.cpele.beetimer.ui
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import me.cpele.beetimer.api.Goal
+import me.cpele.beetimer.domain.GoalTiming
 import me.cpele.beetimer.domain.StatusChange
 import me.cpele.beetimer.repository.BeeRepository
 
@@ -13,7 +13,7 @@ class MainViewModel(
 ) : ViewModel() {
 
     val status: LiveData<StatusChange> = repository.latestStatus
-    val goals: LiveData<List<Goal>> = repository.goals
+    val goalTimings: LiveData<List<GoalTiming>> = repository.goalTimings
 
     fun refresh() = repository.fetch(authToken)
 
@@ -24,6 +24,8 @@ class MainViewModel(
         override fun <T : ViewModel?> create(modelClass: Class<T>): T =
                 modelClass.cast(MainViewModel(repository, authToken))
     }
+
+    fun persist(goalTiming: GoalTiming) = repository.persist(goalTiming)
 
 }
 

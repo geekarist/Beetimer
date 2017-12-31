@@ -6,11 +6,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import kotlinx.android.synthetic.main.view_item.view.*
 import me.cpele.beetimer.R
-import me.cpele.beetimer.api.Goal
+import me.cpele.beetimer.domain.GoalTiming
 import me.cpele.beetimer.domain.Stopwatch
 import java.util.concurrent.TimeUnit
 
-class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+class GoalViewHolder(itemView: View?, private val listener: Listener) : RecyclerView.ViewHolder(itemView) {
 
     private val context: Context
         get() = itemView.context
@@ -20,14 +20,20 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
     private lateinit var handler: Handler
     private lateinit var runnable: Runnable
 
-    fun bind(goal: Goal) {
+    fun bind(goalTiming: GoalTiming) {
+
+        val goal = goalTiming.goal
+
         itemView.item_id.text = goal.slug
         itemView.item_title.text = goal.title
         itemView.item_rate.text = context.getString(R.string.item_rate, goal.rate, goal.runits)
         itemView.item_bare_min.text = goal.limsum
 
-        stopwatch = Stopwatch()
-        itemView.item_timer.setOnClickListener { stopwatch.toggle() }
+        stopwatch = goalTiming.stopwatch
+        itemView.item_timer.setOnClickListener {
+            stopwatch.toggle()
+            listener.onPersist(goalTiming)
+        }
         handler = Handler()
         runnable = Runnable {
             itemView.item_timer.text = stopwatch.format()
@@ -69,5 +75,9 @@ class GoalViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
     fun release() {
         handler.removeCallbacks(runnable)
+    }
+
+    interface Listener {
+        fun onPersist(goalTiming: GoalTiming)
     }
 }

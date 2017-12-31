@@ -2,15 +2,12 @@ package me.cpele.beetimer.domain
 
 import java.util.concurrent.TimeUnit
 
-class Stopwatch {
-
-    private var startTime: Long = 0
-    private var stopTime: Long = 0
-
-    private var running: Boolean = false
-
-    private var elapsedPreviously: Long = 0
-
+class Stopwatch(
+        var startTime: Long = 0,
+        var stopTime: Long = 0,
+        var running: Boolean = false,
+        var elapsedPreviously: Long = 0
+) {
     fun toggle() {
         if (!running) {
             elapsedPreviously += stopTime - startTime

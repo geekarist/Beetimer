@@ -14,12 +14,13 @@ import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.beetimer.R
+import me.cpele.beetimer.domain.GoalTiming
 import me.cpele.beetimer.domain.Status
 import me.cpele.beetimer.repository.BeeRepository
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
 
     private lateinit var mAdapter: GoalAdapter
     private var mMenu: Menu? = null
@@ -49,13 +50,17 @@ class MainActivity : AppCompatActivity() {
 
         repository = CustomApp.instance.beeRepository
 
-        mAdapter = GoalAdapter()
+        mAdapter = GoalAdapter(this)
         main_rv.adapter = mAdapter
 
         if (savedInstanceState == null) {
             viewModel.refresh()
             sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
         }
+    }
+
+    override fun onPersist(goalTiming: GoalTiming) {
+        viewModel.persist(goalTiming)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -69,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             triggerSyncStatus(it?.status ?: Status.LOADING)
         })
 
-        viewModel.goals.observe(this, Observer {
+        viewModel.goalTimings.observe(this, Observer {
             Log.d(localClassName, "Activity received goals: $it")
             mAdapter.refresh(it ?: emptyList())
         })

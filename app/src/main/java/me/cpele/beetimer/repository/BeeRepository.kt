@@ -6,11 +6,13 @@ import android.content.Context
 import me.cpele.beetimer.api.Goal
 import me.cpele.beetimer.api.User
 import me.cpele.beetimer.database.CustomDatabase
-import me.cpele.beetimer.database.dao.GoalDao
+import me.cpele.beetimer.database.dao.GoalTimingDao
 import me.cpele.beetimer.database.dao.StatusChangeDao
 import me.cpele.beetimer.database.dao.UserDao
+import me.cpele.beetimer.domain.GoalTiming
 import me.cpele.beetimer.domain.Status
 import me.cpele.beetimer.domain.StatusChange
+import me.cpele.beetimer.domain.Stopwatch
 import me.cpele.beetimer.ui.CustomApp
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,11 +26,13 @@ class BeeRepository(context: Context, private val executor: Executor) {
             .build()
 
     private val userDao: UserDao = database.userDao()
-    private val goalDao: GoalDao = database.goalDao()
+    private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
 
-    val latestStatus: LiveData<StatusChange> = statusChangeDao.findLatestStatus()
-    val goals: LiveData<List<Goal>> = goalDao.findAllGoals()
+    val latestStatus: LiveData<StatusChange>
+        get() = statusChangeDao.findLatestStatus()
+    val goalTimings: LiveData<List<GoalTiming>>
+        get() = goalTimingDao.findAll()
 
     private fun insertUser(user: User, callback: () -> Unit = {}) =
             executor.execute {
@@ -36,9 +40,17 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 callback()
             }
 
-    private fun insertGoals(list: List<Goal>, callback: () -> Unit = {}) =
+    private fun insertOrUpdateGoalTimings(list: List<Goal>, callback: () -> Unit = {}) =
             executor.execute {
-                goalDao.insert(list)
+                list.map { goal ->
+                    val goalTiming =
+                            goalTimingDao.findOneBySlug(goal.slug)
+                                    ?: GoalTiming(goal = goal, stopwatch = Stopwatch())
+                    goalTiming.goal = goal
+                    goalTiming
+                }.let { goalTimings ->
+                    goalTimingDao.insert(goalTimings)
+                }
                 callback()
             }
 
@@ -47,6 +59,10 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 statusChangeDao.insert(status)
                 callback()
             }
+
+    private fun updateGoalTiming(goalTiming: GoalTiming) = executor.execute {
+        goalTimingDao.insertOne(goalTiming)
+    }
 
     fun fetch(authToken: String?, callback: () -> Unit = {}) = authToken?.apply { fetchUser(this, callback) }
 
@@ -63,6 +79,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
+                    // TODO don't insert user, not needed
                     insertUser(this) {
                         fetchGoals(accessToken, username, callback)
                     }
@@ -82,12 +99,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
-                    insertGoals(this) {
+                    insertOrUpdateGoalTimings(this) {
                         insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
                     }
                 }
             }
         })
+    }
+
+    fun persist(goalTiming: GoalTiming) {
+        updateGoalTiming(goalTiming)
     }
 }
 
