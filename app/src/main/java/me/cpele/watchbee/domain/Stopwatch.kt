@@ -8,6 +8,13 @@ class Stopwatch(
         var running: Boolean = false,
         var elapsedPreviously: Long = 0
 ) {
+    fun clear() {
+        startTime = 0
+        stopTime = 0
+        running = false
+        elapsedPreviously = 0
+    }
+
     fun toggle() {
         if (!running) {
             elapsedPreviously += stopTime - startTime

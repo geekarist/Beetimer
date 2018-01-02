@@ -71,6 +71,11 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
 
         @Suppress("DEPRECATION")
         itemView.item_derail_time.setBackgroundColor(context.resources.getColor(color))
+
+        itemView.item_reset.setOnClickListener {
+            stopwatch.clear()
+            listener.onPersist(goalTiming)
+        }
     }
 
     fun release() {
