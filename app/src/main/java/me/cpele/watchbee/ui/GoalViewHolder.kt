@@ -2,6 +2,7 @@ package me.cpele.watchbee.ui
 
 import android.content.Context
 import android.os.Handler
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import kotlinx.android.synthetic.main.view_item.view.*
@@ -73,8 +74,16 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
         itemView.item_derail_time.setBackgroundColor(context.resources.getColor(color))
 
         itemView.item_reset.setOnClickListener {
-            stopwatch.clear()
-            listener.onPersist(goalTiming)
+            AlertDialog.Builder(context)
+                    .setMessage("Do you really want to reset this stopwatch?")
+                    .setPositiveButton(android.R.string.ok, { _, _ ->
+                        stopwatch.clear()
+                        listener.onPersist(goalTiming)
+                    })
+                    .setNeutralButton(android.R.string.cancel, { dialog, _ ->
+                        dialog.cancel()
+                    })
+                    .show()
         }
     }
 
