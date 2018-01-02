@@ -8,7 +8,6 @@ import me.cpele.beetimer.api.User
 import me.cpele.beetimer.database.CustomDatabase
 import me.cpele.beetimer.database.dao.GoalTimingDao
 import me.cpele.beetimer.database.dao.StatusChangeDao
-import me.cpele.beetimer.database.dao.UserDao
 import me.cpele.beetimer.domain.GoalTiming
 import me.cpele.beetimer.domain.Status
 import me.cpele.beetimer.domain.StatusChange
@@ -25,7 +24,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
             .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
             .build()
 
-    private val userDao: UserDao = database.userDao()
     private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
 
@@ -33,12 +31,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
         get() = statusChangeDao.findLatestStatus()
     val goalTimings: LiveData<List<GoalTiming>>
         get() = goalTimingDao.findAll()
-
-    private fun insertUser(user: User, callback: () -> Unit = {}) =
-            executor.execute {
-                userDao.insert(user)
-                callback()
-            }
 
     private fun insertOrUpdateGoalTimings(list: List<Goal>, callback: () -> Unit = {}) =
             executor.execute {
@@ -79,10 +71,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
-                    // TODO don't insert user, not needed
-                    insertUser(this) {
-                        fetchGoals(accessToken, username, callback)
-                    }
+                    fetchGoals(accessToken, username, callback)
                 }
             }
         })

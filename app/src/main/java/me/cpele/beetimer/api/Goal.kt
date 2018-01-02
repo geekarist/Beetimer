@@ -1,6 +1,5 @@
 package me.cpele.beetimer.api
 
-import android.arch.persistence.room.PrimaryKey
 import android.support.annotation.ColorRes
 import me.cpele.beetimer.R
 
