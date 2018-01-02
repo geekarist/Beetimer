@@ -1,7 +1,7 @@
-package me.cpele.beetimer.database
+package me.cpele.watchbee.database
 
 import android.arch.persistence.room.TypeConverter
-import me.cpele.beetimer.domain.Status
+import me.cpele.watchbee.domain.Status
 
 class ConvertStatus {
 

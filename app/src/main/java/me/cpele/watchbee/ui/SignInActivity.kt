@@ -1,4 +1,4 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_sign_in.*
-import me.cpele.beetimer.R
+import me.cpele.watchbee.R
 
-private const val BMNDR_CLIENT_ID = "30zxgk213ellu3dj730wto3qj"
-private const val BMNDR_REDIRECT_URI = "beetimer://auth_callback"
+private const val BMNDR_CLIENT_ID = "31ictv1j0ieiwnmcjxrs3ncsr"
+private const val BMNDR_REDIRECT_URI = "watchbee://auth_callback"
 
 class SignInActivity : AppCompatActivity() {
 
@@ -53,7 +53,7 @@ class SignInActivity : AppCompatActivity() {
         val action = intent?.action
         val scheme = data?.scheme
         val host = data?.host
-        if (action == Intent.ACTION_VIEW && scheme == "beetimer" && host == "auth_callback") {
+        if (action == Intent.ACTION_VIEW && scheme == "watchbee" && host == "auth_callback") {
             val accessToken = data.getQueryParameter("access_token")
             prefs.edit().putString(PREF_ACCESS_TOKEN, accessToken).apply()
             MainActivity.start(this, accessToken)

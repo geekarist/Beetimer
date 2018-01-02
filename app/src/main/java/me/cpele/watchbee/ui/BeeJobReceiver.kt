@@ -1,4 +1,4 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 class BeeJobReceiver : BroadcastReceiver() {
 
     companion object {
-        private const val ACTION_START_BEE_JOB = "me.cpele.beetimer.ACTION_START_BEE_JOB"
+        private const val ACTION_START_BEE_JOB = "me.cpele.watchbee.ACTION_START_BEE_JOB"
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -44,7 +44,7 @@ class BeeJobReceiver : BroadcastReceiver() {
     class CustomIntent(extraAuthToken: String) : Intent(ACTION_START_BEE_JOB) {
 
         companion object {
-            const val EXTRA_AUTH_TOKEN = "me.cpele.beetimer.EXTRA_AUTH_TOKEN"
+            const val EXTRA_AUTH_TOKEN = "me.cpele.watchbee.EXTRA_AUTH_TOKEN"
         }
 
         init {

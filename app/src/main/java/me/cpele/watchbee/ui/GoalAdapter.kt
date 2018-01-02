@@ -1,10 +1,10 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import me.cpele.beetimer.R
-import me.cpele.beetimer.domain.GoalTiming
+import me.cpele.watchbee.R
+import me.cpele.watchbee.domain.GoalTiming
 
 class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.Adapter<GoalViewHolder>() {
 

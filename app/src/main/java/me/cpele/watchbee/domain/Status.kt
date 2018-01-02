@@ -1,4 +1,4 @@
-package me.cpele.beetimer.domain
+package me.cpele.watchbee.domain
 
 enum class Status {
     SUCCESS, LOADING, FAILURE;

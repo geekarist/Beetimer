@@ -1,10 +1,10 @@
-package me.cpele.beetimer.database.dao
+package me.cpele.watchbee.database.dao
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
-import me.cpele.beetimer.domain.StatusChange
+import me.cpele.watchbee.domain.StatusChange
 
 @Dao
 interface StatusChangeDao {

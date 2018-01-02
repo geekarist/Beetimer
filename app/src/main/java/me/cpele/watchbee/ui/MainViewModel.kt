@@ -1,11 +1,11 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import me.cpele.beetimer.domain.GoalTiming
-import me.cpele.beetimer.domain.StatusChange
-import me.cpele.beetimer.repository.BeeRepository
+import me.cpele.watchbee.domain.GoalTiming
+import me.cpele.watchbee.domain.StatusChange
+import me.cpele.watchbee.repository.BeeRepository
 
 class MainViewModel(
         private val repository: BeeRepository,

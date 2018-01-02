@@ -1,13 +1,13 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.content.Context
 import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import kotlinx.android.synthetic.main.view_item.view.*
-import me.cpele.beetimer.R
-import me.cpele.beetimer.domain.GoalTiming
-import me.cpele.beetimer.domain.Stopwatch
+import me.cpele.watchbee.R
+import me.cpele.watchbee.domain.GoalTiming
+import me.cpele.watchbee.domain.Stopwatch
 import java.util.concurrent.TimeUnit
 
 class GoalViewHolder(itemView: View?, private val listener: Listener) : RecyclerView.ViewHolder(itemView) {

@@ -1,4 +1,4 @@
-package me.cpele.beetimer.domain
+package me.cpele.watchbee.domain
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey

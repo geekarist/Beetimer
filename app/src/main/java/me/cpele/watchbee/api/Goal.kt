@@ -1,7 +1,7 @@
-package me.cpele.beetimer.api
+package me.cpele.watchbee.api
 
 import android.support.annotation.ColorRes
-import me.cpele.beetimer.R
+import me.cpele.watchbee.R
 
 data class Goal(
         val slug: String,

@@ -1,4 +1,4 @@
-package me.cpele.beetimer.repository
+package me.cpele.watchbee.repository
 
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.MutableLiveData

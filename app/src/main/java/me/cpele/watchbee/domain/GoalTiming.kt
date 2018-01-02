@@ -1,9 +1,9 @@
-package me.cpele.beetimer.domain
+package me.cpele.watchbee.domain
 
 import android.arch.persistence.room.Embedded
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import me.cpele.beetimer.api.Goal
+import me.cpele.watchbee.api.Goal
 
 @Entity
 data class GoalTiming(

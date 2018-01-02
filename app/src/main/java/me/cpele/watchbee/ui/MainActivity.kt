@@ -1,4 +1,4 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
@@ -13,10 +13,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
-import me.cpele.beetimer.R
-import me.cpele.beetimer.domain.GoalTiming
-import me.cpele.beetimer.domain.Status
-import me.cpele.beetimer.repository.BeeRepository
+import me.cpele.watchbee.R
+import me.cpele.watchbee.domain.GoalTiming
+import me.cpele.watchbee.domain.Status
+import me.cpele.watchbee.repository.BeeRepository
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 

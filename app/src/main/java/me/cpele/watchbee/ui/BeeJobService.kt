@@ -1,4 +1,4 @@
-package me.cpele.beetimer.ui
+package me.cpele.watchbee.ui
 
 import android.app.job.JobParameters
 import android.app.job.JobService

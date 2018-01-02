@@ -1,4 +1,4 @@
-package me.cpele.beetimer.database
+package me.cpele.watchbee.database
 
 import android.arch.persistence.room.TypeConverter
 import java.util.*
