@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         fun start(context: Context, token: String) {
             val intent = Intent(context, MainActivity::class.java)
             intent.putExtra(ARG_ACCESS_TOKEN, token)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             context.startActivity(intent)
         }
     }
