@@ -85,6 +85,10 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
                     })
                     .show()
         }
+
+        itemView.item_submit.setOnClickListener {
+            listener.onSubmit(goalTiming)
+        }
     }
 
     fun release() {
@@ -93,5 +97,6 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
 
     interface Listener {
         fun onPersist(goalTiming: GoalTiming)
+        fun onSubmit(goalTiming: GoalTiming)
     }
 }

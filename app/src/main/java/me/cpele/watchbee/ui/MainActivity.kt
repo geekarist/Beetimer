@@ -64,6 +64,10 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         viewModel.persist(goalTiming)
     }
 
+    override fun onSubmit(goalTiming: GoalTiming) {
+        viewModel.submit(this, goalTiming)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         Log.d(localClassName, "onCreateOptionsMenu")
         val displayMenu = super.onCreateOptionsMenu(menu)

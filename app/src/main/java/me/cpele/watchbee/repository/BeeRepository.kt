@@ -3,6 +3,10 @@ package me.cpele.watchbee.repository
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Room
 import android.content.Context
+import android.preference.PreferenceManager
+import android.util.Log
+import android.widget.Toast
+import me.cpele.watchbee.api.Datapoint
 import me.cpele.watchbee.api.Goal
 import me.cpele.watchbee.api.User
 import me.cpele.watchbee.database.CustomDatabase
@@ -13,9 +17,11 @@ import me.cpele.watchbee.domain.Status
 import me.cpele.watchbee.domain.StatusChange
 import me.cpele.watchbee.domain.Stopwatch
 import me.cpele.watchbee.ui.CustomApp
+import me.cpele.watchbee.ui.SignInActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 import java.util.concurrent.Executor
 
 class BeeRepository(context: Context, private val executor: Executor) {
@@ -98,6 +104,33 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     fun persist(goalTiming: GoalTiming) {
         updateGoalTiming(goalTiming)
+    }
+
+    fun submit(context: Context, goalTiming: GoalTiming) {
+
+        val userName = "chrp"
+        val goalSlug = "test_watchbee"
+        val datapointValue = "1"
+        val comment = "via WatchBee at ${Date().toString()}"
+        val accessToken = PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
+
+        CustomApp.instance.api
+                .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
+                .enqueue(object: Callback<Datapoint> {
+
+                    override fun onFailure(call: Call<Datapoint>?, t: Throwable?) {
+                        Toast.makeText(context, "Failure", Toast.LENGTH_LONG).show()
+                        val tag = BeeRepository::class.java.simpleName
+                        Log.e(tag, "Error posting goal timing: ", t)
+                    }
+
+                    override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
+                        val msg = "Response body: ${response?.body()}"
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    }
+                })
     }
 }
 
