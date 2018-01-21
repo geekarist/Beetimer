@@ -21,7 +21,7 @@ interface BeeminderApi {
     fun postDatapoint(
             @Path("user") userName: String,
             @Path("goal") goalSlug: String,
-            @Query("value") datapointValue: String,
+            @Query("value") datapointValue: Float,
             @Query("comment") comment: String,
             @Query("access_token") accessToken: String
     ): Call<Datapoint>

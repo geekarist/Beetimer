@@ -8,6 +8,15 @@ class Stopwatch(
         var running: Boolean = false,
         var elapsedPreviously: Long = 0
 ) {
+    val elapsedDecimalMinutes: Float get() = elapsedMillis / (1000f * 60f * 60f)
+
+    private val elapsedMillis: Long
+        get() {
+            return elapsedPreviously +
+                    if (running) System.currentTimeMillis() - startTime
+                    else stopTime - startTime
+        }
+
     fun clear() {
         startTime = 0
         stopTime = 0
@@ -26,13 +35,7 @@ class Stopwatch(
         }
     }
 
-    private fun elapsedMillis(): Long =
-            elapsedPreviously +
-                    if (running) System.currentTimeMillis() - startTime
-                    else stopTime - startTime
-
     fun format(): String {
-        val elapsedMillis = elapsedMillis()
         val hours = TimeUnit.MILLISECONDS.toHours(elapsedMillis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedMillis - TimeUnit.HOURS.toMillis(hours))
         val seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMillis

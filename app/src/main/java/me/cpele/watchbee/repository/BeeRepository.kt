@@ -109,9 +109,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
     fun submit(context: Context, goalTiming: GoalTiming) {
 
         val userName = "chrp"
-        val goalSlug = "test_watchbee"
-        val datapointValue = "1"
-        val comment = "via WatchBee at ${Date().toString()}"
+        val goalSlug = goalTiming.goal.slug
+        val datapointValue = goalTiming.stopwatch.elapsedDecimalMinutes
+        val comment = "via WatchBee at ${Date()}"
         val accessToken = PreferenceManager
                 .getDefaultSharedPreferences(context)
                 .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
