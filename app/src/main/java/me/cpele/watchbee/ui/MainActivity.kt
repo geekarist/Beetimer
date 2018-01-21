@@ -84,6 +84,11 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
             mAdapter.refresh(it ?: emptyList())
         })
 
+        viewModel.user.observe(this, Observer {
+            Log.d(localClassName, "Activity received user: $it")
+            supportActionBar?.title = it?.username
+        })
+
         return displayMenu
     }
 
