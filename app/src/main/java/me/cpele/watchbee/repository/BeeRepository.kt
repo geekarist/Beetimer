@@ -12,7 +12,6 @@ import me.cpele.watchbee.api.User
 import me.cpele.watchbee.database.CustomDatabase
 import me.cpele.watchbee.database.dao.GoalTimingDao
 import me.cpele.watchbee.database.dao.StatusChangeDao
-import me.cpele.watchbee.database.dao.UserDao
 import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.Status
 import me.cpele.watchbee.domain.StatusChange
@@ -33,18 +32,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
-    private val userDao: UserDao = database.userDao()
 
     val latestStatus: LiveData<StatusChange> get() = statusChangeDao.findLatestStatus()
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
-    val user: LiveData<User> get() = userDao.findLast()
 
-    private fun insertOrUpdateGoalTimings(list: List<Goal>, callback: () -> Unit = {}) =
+    private fun insertOrUpdateGoalTimings(user: String, list: List<Goal>, callback: () -> Unit = {}) =
             executor.execute {
                 list.map { goal ->
                     val goalTiming =
                             goalTimingDao.findOneBySlug(goal.slug)
-                                    ?: GoalTiming(goal = goal, stopwatch = Stopwatch())
+                                    ?: GoalTiming(user = user, goal = goal, stopwatch = Stopwatch())
                     goalTiming.goal = goal
                     goalTiming
                 }.let { goalTimings ->
@@ -78,10 +75,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
-                    executor.execute {
-                        userDao.deleteAll()
-                        userDao.insert(this)
-                    }
                     fetchGoals(accessToken, username, callback)
                 }
             }
@@ -99,7 +92,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
-                    insertOrUpdateGoalTimings(this) {
+                    insertOrUpdateGoalTimings(user, this) {
                         insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
                     }
                 }

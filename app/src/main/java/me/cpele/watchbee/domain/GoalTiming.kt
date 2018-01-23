@@ -8,6 +8,7 @@ import me.cpele.watchbee.api.Goal
 @Entity
 data class GoalTiming(
         @PrimaryKey(autoGenerate = true) val id: Long = 0,
+        val user: String,
         @Embedded var goal: Goal,
         @Embedded val stopwatch: Stopwatch
 )

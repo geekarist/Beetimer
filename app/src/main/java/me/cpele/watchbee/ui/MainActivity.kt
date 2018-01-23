@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         mAdapter = GoalAdapter(this)
         main_rv.adapter = mAdapter
 
+        supportActionBar?.title = getString(R.string.app_name)
+
         if (savedInstanceState == null) {
             viewModel.refresh()
             sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
@@ -81,12 +83,8 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
 
         viewModel.goalTimings.observe(this, Observer {
             Log.d(localClassName, "Activity received goals: $it")
+            supportActionBar?.subtitle = it?.firstOrNull()?.user
             mAdapter.refresh(it ?: emptyList())
-        })
-
-        viewModel.user.observe(this, Observer {
-            Log.d(localClassName, "Activity received user: $it")
-            supportActionBar?.title = it?.username
         })
 
         return displayMenu

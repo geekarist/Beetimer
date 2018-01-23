@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
-import me.cpele.watchbee.api.User
 import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.StatusChange
 import me.cpele.watchbee.repository.BeeRepository
@@ -16,7 +15,6 @@ class MainViewModel(
 
     val status: LiveData<StatusChange> = repository.latestStatus
     val goalTimings: LiveData<List<GoalTiming>> = repository.goalTimings
-    val user: LiveData<User> = repository.user
 
     fun refresh() = repository.fetch(authToken)
 
