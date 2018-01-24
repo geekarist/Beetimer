@@ -127,6 +127,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
                         val msg = "Response body: ${response?.body()}"
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                        goalTiming.stopwatch.clear()
+                        persist(goalTiming)
                     }
                 })
     }
