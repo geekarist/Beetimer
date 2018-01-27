@@ -18,8 +18,8 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
 
     private lateinit var stopwatch: Stopwatch
 
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
+    private var handler: Handler = Handler()
+    private var runnable: Runnable? = null
 
     fun bind(goalTiming: GoalTiming) {
 
@@ -35,10 +35,10 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
             stopwatch.toggle()
             listener.onPersist(goalTiming)
         }
-        handler = Handler()
+        runnable?.let { handler.removeCallbacks(it) }
         runnable = Runnable {
             itemView.item_timer.text = stopwatch.format()
-            handler.postDelayed(runnable, 200)
+            handler.postDelayed(runnable, 1000)
         }
         handler.post(runnable)
 
@@ -92,7 +92,7 @@ class GoalViewHolder(itemView: View?, private val listener: Listener) : Recycler
     }
 
     fun release() {
-        handler.removeCallbacks(runnable)
+        runnable?.let { handler.removeCallbacks(it) }
     }
 
     interface Listener {
