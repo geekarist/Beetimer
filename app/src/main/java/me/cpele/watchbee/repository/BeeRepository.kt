@@ -114,6 +114,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 .getDefaultSharedPreferences(context)
                 .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
 
+        insertStatusChange(StatusChange(status = Status.LOADING))
+
         CustomApp.instance.api
                 .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
                 .enqueue(object: Callback<Datapoint> {
@@ -122,6 +124,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                         Toast.makeText(context, "Failure", Toast.LENGTH_LONG).show()
                         val tag = BeeRepository::class.java.simpleName
                         Log.e(tag, "Error posting goal timing: ", t)
+                        insertStatusChange(StatusChange(status = Status.FAILURE))
                     }
 
                     override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
@@ -129,6 +132,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                         goalTiming.stopwatch.clear()
                         persist(goalTiming)
+                        insertStatusChange(StatusChange(status = Status.SUCCESS))
                     }
                 })
     }

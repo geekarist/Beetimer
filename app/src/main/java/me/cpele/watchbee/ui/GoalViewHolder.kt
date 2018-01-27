@@ -11,7 +11,10 @@ import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.Stopwatch
 import java.util.concurrent.TimeUnit
 
-class GoalViewHolder(itemView: View?, private val listener: Listener) : RecyclerView.ViewHolder(itemView) {
+class GoalViewHolder(
+        itemView: View?,
+        private val listener: Listener
+) : RecyclerView.ViewHolder(itemView) {
 
     private val context: Context
         get() = itemView.context
