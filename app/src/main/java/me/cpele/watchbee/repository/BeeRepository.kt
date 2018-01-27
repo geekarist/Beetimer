@@ -106,7 +106,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     fun submit(context: Context, goalTiming: GoalTiming) {
 
-        val userName = "chrp"
+        val userName = goalTiming.user
         val goalSlug = goalTiming.goal.slug
         val datapointValue = goalTiming.stopwatch.elapsedDecimalMinutes
         val comment = "via WatchBee at ${Date()}"
