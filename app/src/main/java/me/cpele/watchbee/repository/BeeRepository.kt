@@ -5,17 +5,14 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import android.preference.PreferenceManager
 import android.util.Log
-import android.widget.Toast
 import me.cpele.watchbee.api.Datapoint
 import me.cpele.watchbee.api.Goal
 import me.cpele.watchbee.api.User
 import me.cpele.watchbee.database.CustomDatabase
 import me.cpele.watchbee.database.dao.GoalTimingDao
+import me.cpele.watchbee.database.dao.PendingDatapointDao
 import me.cpele.watchbee.database.dao.StatusChangeDao
-import me.cpele.watchbee.domain.GoalTiming
-import me.cpele.watchbee.domain.Status
-import me.cpele.watchbee.domain.StatusChange
-import me.cpele.watchbee.domain.Stopwatch
+import me.cpele.watchbee.domain.*
 import me.cpele.watchbee.ui.CustomApp
 import me.cpele.watchbee.ui.SignInActivity
 import retrofit2.Call
@@ -32,6 +29,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
+    private val pendingDatapointDao: PendingDatapointDao = database.pendingDatapointDao()
 
     val latestStatus: LiveData<StatusChange> get() = statusChangeDao.findLatestStatus()
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
@@ -45,8 +43,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     goalTiming.goal = goal
                     goalTiming
                 }.let { goalTimings ->
-                    goalTimingDao.insert(goalTimings)
-                }
+                            goalTimingDao.insert(goalTimings)
+                        }
                 callback()
             }
 
@@ -75,7 +73,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 response?.body()?.apply {
-                    fetchGoals(accessToken, username, callback)
+                    postQueuedDatapoints(accessToken, username) {
+                        fetchGoals(accessToken, username, callback)
+                    }
                 }
             }
         })
@@ -114,27 +114,75 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 .getDefaultSharedPreferences(context)
                 .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
 
+        postDatapoint(userName, goalSlug, datapointValue, comment, accessToken, goalTiming)
+    }
+
+    private fun postDatapoint(
+            userName: String,
+            goalSlug: String,
+            datapointValue: Float,
+            comment: String,
+            accessToken: String,
+            goalTiming: GoalTiming
+    ) {
         insertStatusChange(StatusChange(status = Status.LOADING))
 
         CustomApp.instance.api
                 .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
-                .enqueue(object: Callback<Datapoint> {
+                .enqueue(object : Callback<Datapoint> {
 
                     override fun onFailure(call: Call<Datapoint>?, t: Throwable?) {
-                        Toast.makeText(context, "Failure", Toast.LENGTH_LONG).show()
                         val tag = BeeRepository::class.java.simpleName
                         Log.e(tag, "Error posting goal timing: ", t)
                         insertStatusChange(StatusChange(status = Status.FAILURE))
+                        enqueueDatapoint(userName, goalSlug, datapointValue, comment)
                     }
 
                     override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
-                        val msg = "Response body: ${response?.body()}"
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                         goalTiming.stopwatch.clear()
                         persist(goalTiming)
                         insertStatusChange(StatusChange(status = Status.SUCCESS))
                     }
                 })
+    }
+
+    private fun enqueueDatapoint(
+            userName: String,
+            goalSlug: String,
+            datapointValue: Float,
+            comment: String
+    ) {
+        executor.execute {
+            val datapoint = DatapointBo(
+                    userName = userName,
+                    goalSlug = goalSlug,
+                    datapointValue = datapointValue,
+                    comment = comment
+            )
+            pendingDatapointDao.insertOne(datapoint)
+        }
+    }
+
+    private fun postQueuedDatapoints(accessToken: String, userName: String, callback: () -> Unit) {
+        executor.execute {
+            val pendingDatapoints = pendingDatapointDao.findAll(userName)
+            Log.d(javaClass.simpleName, "Found pending datapoints: $pendingDatapoints")
+            pendingDatapoints.forEach { datapoint ->
+                pendingDatapointDao.deleteOne(datapoint)
+                val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
+                goalTiming?.let { gt ->
+                    postDatapoint(
+                            userName,
+                            datapoint.goalSlug,
+                            datapoint.datapointValue,
+                            datapoint.comment,
+                            accessToken,
+                            gt
+                    )
+                }
+            }
+            callback()
+        }
     }
 }
 
