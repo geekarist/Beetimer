@@ -58,7 +58,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
         goalTimingDao.insertOne(goalTiming)
     }
 
-    fun fetch(authToken: String?, callback: () -> Unit = {}) = authToken?.apply { fetchUser(this, callback) }
+    fun fetch(authToken: String?, callback: () -> Unit = {}) {
+        authToken?.apply { fetchUser(this, callback) }
+    }
 
     private fun fetchUser(accessToken: String, callback: () -> Unit) {
 
@@ -123,9 +125,10 @@ class BeeRepository(context: Context, private val executor: Executor) {
             datapointValue: Float,
             comment: String,
             accessToken: String,
-            goalTiming: GoalTiming
+            goalTiming: GoalTiming,
+            indicateStatusChange: Boolean = true
     ) {
-        insertStatusChange(StatusChange(status = Status.LOADING))
+        if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.LOADING))
 
         CustomApp.instance.api
                 .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
@@ -134,14 +137,18 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     override fun onFailure(call: Call<Datapoint>?, t: Throwable?) {
                         val tag = BeeRepository::class.java.simpleName
                         Log.e(tag, "Error posting goal timing: ", t)
-                        insertStatusChange(StatusChange(status = Status.FAILURE))
+                        if (indicateStatusChange) {
+                            insertStatusChange(StatusChange(status = Status.FAILURE))
+                        }
                         enqueueDatapoint(userName, goalSlug, datapointValue, comment)
                     }
 
                     override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
                         goalTiming.stopwatch.clear()
                         persist(goalTiming)
-                        insertStatusChange(StatusChange(status = Status.SUCCESS))
+                        if (indicateStatusChange) {
+                            insertStatusChange(StatusChange(status = Status.SUCCESS))
+                        }
                     }
                 })
     }
@@ -177,7 +184,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
                             datapoint.datapointValue,
                             datapoint.comment,
                             accessToken,
-                            gt
+                            goalTiming = gt,
+                            indicateStatusChange = false
                     )
                 }
             }
