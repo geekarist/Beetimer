@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         })
 
         viewModel.isAnyTimerRunning.observe(this, Observer {
-            Log.d(localClassName, "Running status changed for a timer to: $it.value")
+            Log.d(localClassName, "Running status changed for a timer to: $it")
             if (it == true) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         })
