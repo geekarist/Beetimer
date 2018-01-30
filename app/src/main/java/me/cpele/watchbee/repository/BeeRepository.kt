@@ -177,7 +177,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
             pendingDatapoints.forEach { datapoint ->
                 pendingDatapointDao.deleteOne(datapoint)
                 val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
-                goalTiming?.let { gt ->
+                goalTiming?.let {
                     postDatapoint(
                             userName,
                             datapoint.goalSlug,
