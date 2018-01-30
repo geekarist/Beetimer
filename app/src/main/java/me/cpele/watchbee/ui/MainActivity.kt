@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.watchbee.R
@@ -85,6 +86,12 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
             Log.d(localClassName, "Activity received goals: $it")
             supportActionBar?.subtitle = it?.firstOrNull()?.user
             mAdapter.refresh(it ?: emptyList())
+        })
+
+        viewModel.isAnyTimerRunning.observe(this, Observer {
+            Log.d(localClassName, "Running status changed for a timer to: $it.value")
+            if (it == true) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         })
 
         return displayMenu

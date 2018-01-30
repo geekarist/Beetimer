@@ -20,4 +20,7 @@ interface GoalTimingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOne(goalTiming: GoalTiming)
+
+    @Query("SELECT CAST((COUNT(*) > 0) AS BOOLEAN) FROM GoalTiming WHERE running = 1")
+    fun isAnyoneRunning(): LiveData<Boolean>
 }

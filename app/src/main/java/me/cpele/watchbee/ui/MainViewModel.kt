@@ -15,6 +15,7 @@ class MainViewModel(
 
     val status: LiveData<StatusChange> = repository.latestStatus
     val goalTimings: LiveData<List<GoalTiming>> = repository.goalTimings
+    val isAnyTimerRunning: LiveData<Boolean> = repository.isAnyTimerRunning()
 
     fun refresh() = repository.fetch(authToken)
 

@@ -191,5 +191,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
             callback()
         }
     }
+
+    fun isAnyTimerRunning(): LiveData<Boolean> {
+        return goalTimingDao.isAnyoneRunning()
+    }
 }
 
