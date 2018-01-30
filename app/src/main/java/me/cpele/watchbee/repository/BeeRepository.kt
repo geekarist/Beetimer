@@ -116,7 +116,10 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 .getDefaultSharedPreferences(context)
                 .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
 
-        postDatapoint(userName, goalSlug, datapointValue, comment, accessToken, goalTiming)
+        goalTiming.stopwatch.clear()
+        persist(goalTiming)
+
+        postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
     }
 
     private fun postDatapoint(
@@ -125,7 +128,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
             datapointValue: Float,
             comment: String,
             accessToken: String,
-            goalTiming: GoalTiming,
             indicateStatusChange: Boolean = true
     ) {
         if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.LOADING))
@@ -144,8 +146,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     }
 
                     override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
-                        goalTiming.stopwatch.clear()
-                        persist(goalTiming)
                         if (indicateStatusChange) {
                             insertStatusChange(StatusChange(status = Status.SUCCESS))
                         }
@@ -184,7 +184,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
                             datapoint.datapointValue,
                             datapoint.comment,
                             accessToken,
-                            goalTiming = gt,
                             indicateStatusChange = false
                     )
                 }
