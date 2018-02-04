@@ -2,6 +2,7 @@ package me.cpele.watchbee.ui
 
 import android.content.Context
 import android.os.Handler
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -41,6 +42,7 @@ class GoalViewHolder(
         runnable?.let { handler.removeCallbacks(it) }
         runnable = Runnable {
             itemView.item_timer.text = stopwatch.format()
+            itemView.item_timer.setTextColor(ContextCompat.getColor(context, stopwatch.color()))
             handler.postDelayed(runnable, 1000)
         }
         handler.post(runnable)

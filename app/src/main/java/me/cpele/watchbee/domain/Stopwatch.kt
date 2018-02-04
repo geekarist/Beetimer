@@ -1,5 +1,7 @@
 package me.cpele.watchbee.domain
 
+import android.support.annotation.ColorRes
+import me.cpele.watchbee.R
 import java.util.concurrent.TimeUnit
 
 class Stopwatch(
@@ -42,5 +44,16 @@ class Stopwatch(
                 - TimeUnit.MINUTES.toMillis(minutes)
                 - TimeUnit.HOURS.toMillis(hours))
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    @ColorRes
+    fun color(): Int {
+        return when (running) {
+            false -> when (elapsedMillis > 0) {
+                false -> R.color.stopwatch_stopped
+                true -> R.color.stopwatch_paused
+            }
+            true -> R.color.stopwatch_running
+        }
     }
 }
