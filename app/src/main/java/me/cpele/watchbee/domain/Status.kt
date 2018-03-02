@@ -13,5 +13,11 @@ enum class Status {
             status.cause = throwable
             return status
         }
+
+        fun failure(msg: String): Status {
+            val status = FAILURE
+            status.msg = msg
+            return status
+        }
     }
 }

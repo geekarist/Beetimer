@@ -74,10 +74,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
-                response?.body()?.apply {
-                    postQueuedDatapoints(accessToken, username) {
-                        fetchGoals(accessToken, username, callback)
+                if (response?.isSuccessful == true) {
+                    response.body()?.apply {
+                        postQueuedDatapoints(accessToken, username) {
+                            fetchGoals(accessToken, username, callback)
+                        }
                     }
+                } else {
+                    val errorMsg = "Error loading user: status ${response?.code()}"
+                    val errorStatus = Status.failure(errorMsg)
+                    insertStatusChange(StatusChange(status = errorStatus), callback)
                 }
             }
         })

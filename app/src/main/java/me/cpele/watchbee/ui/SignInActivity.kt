@@ -66,7 +66,8 @@ class SignInActivity : AppCompatActivity() {
 
     private fun trySavedToken(prefs: SharedPreferences): Boolean {
         if (prefs.contains(PREF_ACCESS_TOKEN)) {
-            MainActivity.start(this, prefs.getString(PREF_ACCESS_TOKEN, null))
+            val token = prefs.getString(PREF_ACCESS_TOKEN, null)
+            MainActivity.start(this, token)
             finish()
             return true
         }
