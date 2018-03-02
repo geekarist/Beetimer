@@ -80,6 +80,9 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
             triggerSyncStatus(it?.status ?: Status.LOADING)
+            if (it?.status == Status.AUTH_ERROR) {
+                SignInActivity.start(context = this@MainActivity, clearToken = true)
+            }
         })
 
         viewModel.goalTimings.observe(this, Observer {
@@ -100,7 +103,7 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
     private fun triggerSyncStatus(status: Status) = when (status) {
         Status.SUCCESS -> succeedSyncAnim()
         Status.LOADING -> startSyncAnim()
-        Status.FAILURE -> failSyncAnim()
+        Status.FAILURE, Status.AUTH_ERROR -> failSyncAnim()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

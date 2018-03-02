@@ -16,6 +16,14 @@ class SignInActivity : AppCompatActivity() {
 
     companion object {
         const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
+        private const val EXTRA_CLEAR_TOKEN = "EXTRA_CLEAR_TOKEN"
+
+        fun start(context: MainActivity, clearToken: Boolean) {
+            val intent = Intent(context, SignInActivity::class.java)
+            intent.putExtra(EXTRA_CLEAR_TOKEN, clearToken)
+            context.startActivity(intent)
+            context.finish()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +73,10 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun trySavedToken(prefs: SharedPreferences): Boolean {
-        if (prefs.contains(PREF_ACCESS_TOKEN)) {
+
+        if (intent.getBooleanExtra(EXTRA_CLEAR_TOKEN, false)) {
+            prefs.edit().remove(PREF_ACCESS_TOKEN).apply()
+        } else if (prefs.contains(PREF_ACCESS_TOKEN)) {
             val token = prefs.getString(PREF_ACCESS_TOKEN, null)
             MainActivity.start(this, token)
             finish()

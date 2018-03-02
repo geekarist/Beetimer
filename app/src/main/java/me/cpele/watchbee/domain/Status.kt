@@ -1,7 +1,7 @@
 package me.cpele.watchbee.domain
 
 enum class Status {
-    SUCCESS, LOADING, FAILURE;
+    SUCCESS, LOADING, FAILURE, AUTH_ERROR;
 
     private lateinit var msg: String
     private var cause: Throwable? = null
@@ -14,8 +14,8 @@ enum class Status {
             return status
         }
 
-        fun failure(msg: String): Status {
-            val status = FAILURE
+        fun authError(msg: String): Status {
+            val status = AUTH_ERROR
             status.msg = msg
             return status
         }

@@ -82,7 +82,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     }
                 } else {
                     val errorMsg = "Error loading user: status ${response?.code()}"
-                    val errorStatus = Status.failure(errorMsg)
+                    val errorStatus = Status.authError(errorMsg)
                     insertStatusChange(StatusChange(status = errorStatus), callback)
                 }
             }
