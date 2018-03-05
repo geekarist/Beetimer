@@ -43,8 +43,12 @@ class SignInActivity : AppCompatActivity() {
 
         val signInButton = sign_in_bt
         signInButton.setOnClickListener {
-            val uri = Uri.parse("https://www.beeminder.com/apps/authorize?" +
-                    "client_id=${BMNDR_CLIENT_ID}&redirect_uri=${BMNDR_REDIRECT_URI}&response_type=token")
+            val uri = Uri.parse(
+                    "https://www.beeminder.com/apps/authorize?" +
+                            "client_id=${BMNDR_CLIENT_ID}&" +
+                            "redirect_uri=${BMNDR_REDIRECT_URI}&" +
+                            "response_type=token"
+            )
             val intent = Intent(Intent.ACTION_VIEW, uri)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
