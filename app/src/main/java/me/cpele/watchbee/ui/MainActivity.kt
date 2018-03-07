@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.watchbee.R
@@ -136,8 +137,27 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         Log.d(localClassName, "succeedSyncAnim")
         val item = mMenu?.findItem(R.id.main_menu_sync)
         item?.actionView?.clearAnimation()
-        item?.actionView = null
-        item?.setIcon(R.drawable.ic_sync_white_24dp)
+        item?.actionView?.startAnimation(checkThenFadeOutThenReset(item))
+    }
+
+    private fun checkThenFadeOutThenReset(item: MenuItem?): Animation? {
+
+        val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out)
+
+        animation.setAnimationListener(object: Animation.AnimationListener {
+            override fun onAnimationRepeat(animation: Animation?) {
+            }
+
+            override fun onAnimationStart(animation: Animation?) {
+                item?.setIcon(R.drawable.ic_check_circle_white_24dp)
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                item?.setIcon(R.drawable.ic_sync_white_24dp)
+                item?.actionView = null
+            }
+        })
+        return animation
     }
 
     private fun failSyncAnim() {
