@@ -1,5 +1,6 @@
 package me.cpele.watchbee.ui
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -12,8 +13,8 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.watchbee.R
 import me.cpele.watchbee.domain.GoalTiming
@@ -137,27 +138,28 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         Log.d(localClassName, "succeedSyncAnim")
         val item = mMenu?.findItem(R.id.main_menu_sync)
         item?.actionView?.clearAnimation()
-        item?.actionView?.startAnimation(checkThenFadeOutThenReset(item))
-    }
+        item?.actionView
+                ?.animate()
+                ?.alpha(0f)
+                ?.setDuration(500)
+                ?.setListener(object: Animator.AnimatorListener {
+                    override fun onAnimationRepeat(animation: Animator?) {
+                    }
 
-    private fun checkThenFadeOutThenReset(item: MenuItem?): Animation? {
+                    override fun onAnimationCancel(animation: Animator?) {
+                    }
 
-        val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out)
+                    override fun onAnimationStart(animation: Animator?) {
+                        val itemImageView: ImageView = item.actionView as ImageView
+                        itemImageView.setImageResource(R.drawable.ic_check_circle_white_24dp)
+                    }
 
-        animation.setAnimationListener(object: Animation.AnimationListener {
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-
-            override fun onAnimationStart(animation: Animation?) {
-                item?.setIcon(R.drawable.ic_check_circle_white_24dp)
-            }
-
-            override fun onAnimationEnd(animation: Animation?) {
-                item?.setIcon(R.drawable.ic_sync_white_24dp)
-                item?.actionView = null
-            }
-        })
-        return animation
+                    override fun onAnimationEnd(animation: Animator?) {
+                        item.setIcon(R.drawable.ic_sync_white_24dp)
+                        item.actionView = null
+                    }
+                })
+                ?.start()
     }
 
     private fun failSyncAnim() {
