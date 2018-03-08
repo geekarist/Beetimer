@@ -6,13 +6,16 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.util.DisplayMetrics
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.WindowManager
+import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -56,6 +59,31 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
 
         mAdapter = GoalAdapter(this)
         main_rv.adapter = mAdapter
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            main_rv.layoutManager = LinearLayoutManager(this)
+        } else {
+            main_rv.layoutManager = GridLayoutManager(this, 2)
+            val displayMetrics = DisplayMetrics()
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
+            main_rv.addItemDecoration(object: RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                        outRect: Rect?,
+                        view: View?,
+                        parent: RecyclerView?,
+                        state: RecyclerView.State?
+                ) {
+                    val position = parent?.getChildAdapterPosition(view)
+                    var left = 0
+                    if (position?.rem(2) != 0) {
+                        val marginParams = view?.layoutParams as ViewGroup.MarginLayoutParams
+                        marginParams.leftMargin
+                        left = -marginParams.leftMargin
+                    }
+                    outRect?.set(left, 0, 0, 0)
+                }
+            })
+        }
 
         supportActionBar?.title = getString(R.string.app_name)
 
