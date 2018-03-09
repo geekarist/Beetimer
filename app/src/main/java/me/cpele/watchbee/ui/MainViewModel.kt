@@ -29,6 +29,6 @@ class MainViewModel(
 
     fun persist(goalTiming: GoalTiming) = repository.persist(goalTiming)
 
-    fun submit(context: Context, goalTiming: GoalTiming) { repository.submit(context, goalTiming) }
+    fun submit(context: Context, goalTiming: GoalTiming) = repository.submit(context, goalTiming)
 }
 

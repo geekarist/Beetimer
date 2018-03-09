@@ -8,5 +8,6 @@ import java.util.*
 data class StatusChange(
         @PrimaryKey(autoGenerate = true) val id: Long = 0,
         val date: Date = Date(),
-        val status: Status
+        val status: Status,
+        val message: String? = null
 )

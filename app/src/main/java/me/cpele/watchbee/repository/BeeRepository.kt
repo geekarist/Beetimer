@@ -1,7 +1,9 @@
 package me.cpele.watchbee.repository
 
 import android.arch.lifecycle.LiveData
+import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
+import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.preference.PreferenceManager
 import android.util.Log
@@ -25,7 +27,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val database: CustomDatabase = Room
             .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
+            .addMigrations(Companion.MIGRATION_1_TO_2)
             .build()
+
+    companion object {
+        private val MIGRATION_1_TO_2 = object: Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE StatusChange ADD COLUMN message TEXT")
+            }
+        }
+    }
 
     private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
@@ -153,7 +164,10 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
                     override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
                         if (indicateStatusChange) {
-                            insertStatusChange(StatusChange(status = Status.SUCCESS))
+                            insertStatusChange(StatusChange(
+                                    status = Status.SUCCESS,
+                                    message = "Datapoint submitted successfully"
+                            ))
                         }
                     }
                 })

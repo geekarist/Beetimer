@@ -10,7 +10,7 @@ import me.cpele.watchbee.domain.DatapointBo
 import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.StatusChange
 
-@Database(entities = [GoalTiming::class, StatusChange::class, DatapointBo::class], version = 1)
+@Database(entities = [GoalTiming::class, StatusChange::class, DatapointBo::class], version = 2)
 @TypeConverters(ConvertStatus::class, ConvertDate::class)
 abstract class CustomDatabase : RoomDatabase() {
     abstract fun goalTimingDao(): GoalTimingDao

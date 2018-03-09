@@ -1,9 +1,7 @@
 package me.cpele.watchbee.ui
 
 import android.app.Application
-import me.cpele.watchbee.AppExecutors
 import me.cpele.watchbee.BuildConfig
-import me.cpele.watchbee.api.BeeminderApi
 import me.cpele.watchbee.repository.BeeRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.watchbee.R
 import me.cpele.watchbee.domain.GoalTiming
@@ -94,6 +95,9 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
             triggerSyncStatus(it?.status ?: Status.LOADING)
             if (it?.status == Status.AUTH_ERROR) {
                 SignInActivity.start(context = this@MainActivity, clearToken = true)
+            }
+            it?.message?.apply {
+                Toast.makeText(this@MainActivity, this, Toast.LENGTH_LONG).show()
             }
         })
 
