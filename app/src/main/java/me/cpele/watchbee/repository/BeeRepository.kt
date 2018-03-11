@@ -1,6 +1,8 @@
 package me.cpele.watchbee.repository
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.Observer
 import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
@@ -31,7 +33,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
             .build()
 
     companion object {
-        private val MIGRATION_1_TO_2 = object: Migration(1, 2) {
+        private val MIGRATION_1_TO_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE StatusChange ADD COLUMN message TEXT")
             }
@@ -42,7 +44,21 @@ class BeeRepository(context: Context, private val executor: Executor) {
     private val statusChangeDao: StatusChangeDao = database.statusDao()
     private val pendingDatapointDao: PendingDatapointDao = database.pendingDatapointDao()
 
-    val latestStatus: LiveData<StatusChange> get() = statusChangeDao.findLatestStatus()
+    val latestStatus: LiveData<StatusChange> get() {
+        val distinctLiveData = MediatorLiveData<StatusChange>()
+        distinctLiveData.addSource(statusChangeDao.findLatestStatus(), object: Observer<StatusChange> {
+            var previousValue: StatusChange? = null
+            override fun onChanged(value: StatusChange?) {
+                val isChanging = value != previousValue
+                if (isChanging) {
+                    previousValue = value
+                    distinctLiveData.value = value
+                }
+            }
+        })
+        return distinctLiveData
+    }
+
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
 
     private fun insertOrUpdateGoalTimings(user: String, list: List<Goal>, callback: () -> Unit = {}) =
@@ -59,11 +75,12 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 callback()
             }
 
-    private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) =
-            executor.execute {
-                statusChangeDao.insert(status)
-                callback()
-            }
+    private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) {
+        executor.execute {
+            statusChangeDao.insert(status)
+            callback()
+        }
+    }
 
     private fun updateGoalTiming(goalTiming: GoalTiming) = executor.execute {
         goalTimingDao.insertOne(goalTiming)
