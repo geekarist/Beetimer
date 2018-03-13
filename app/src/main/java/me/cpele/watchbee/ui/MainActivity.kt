@@ -144,8 +144,9 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         syncActionView.startAnimation(syncAnimation)
 
         val item = mMenu?.findItem(R.id.main_menu_sync)
+        item?.actionView?.clearAnimation()
         item?.actionView = syncActionView
-        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+        item?.setIcon(R.drawable.ic_sync_white_24dp)
     }
 
     private fun succeedSyncAnim() {
@@ -164,8 +165,8 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
                     }
 
                     override fun onAnimationStart(animation: Animator?) {
-                        val itemImageView: ImageView = item.actionView as ImageView
-                        itemImageView.setImageResource(R.drawable.ic_check_circle_white_24dp)
+                        val itemImageView: ImageView? = item.actionView as ImageView?
+                        itemImageView?.setImageResource(R.drawable.ic_check_circle_white_24dp)
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
