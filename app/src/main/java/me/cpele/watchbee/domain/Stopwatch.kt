@@ -28,13 +28,21 @@ class Stopwatch(
 
     fun toggle() {
         if (!running) {
-            elapsedPreviously += stopTime - startTime
-            startTime = System.currentTimeMillis()
-            running = true
+            start()
         } else {
-            stopTime = System.currentTimeMillis()
-            running = false
+            stop()
         }
+    }
+
+    fun stop() {
+        stopTime = System.currentTimeMillis()
+        running = false
+    }
+
+    fun start() {
+        elapsedPreviously += stopTime - startTime
+        startTime = System.currentTimeMillis()
+        running = true
     }
 
     fun format(): String {
