@@ -49,7 +49,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
         distinctLiveData.addSource(statusChangeDao.findLatestStatus(), object: Observer<StatusChange> {
             var previousValue: StatusChange? = null
             override fun onChanged(value: StatusChange?) {
-                val isChanging = value != previousValue
+                val isChanging = value?.status != previousValue?.status
                 if (isChanging) {
                     previousValue = value
                     distinctLiveData.value = value
