@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent=".4"
+            app:layout_constraintGuide_percent=".42"
             />
 
         <TextView
@@ -42,9 +42,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
             android:layout_marginStart="12dp"
-            android:width="105sp"
+            android:width="@dimen/item_timer_width"
             android:gravity="center"
-            android:textSize="26sp"
+            android:textSize="@dimen/item_timer_text_size"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/item_title"
             tools:text="00:00:00"
@@ -81,11 +81,13 @@
 
         <TextView
             android:id="@+id/item_id"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/item_rate"
             app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
+            app:layout_constraintRight_toLeftOf="@id/item_derail_days"
             app:layout_constraintTop_toTopOf="@id/item_timer"
             app:layout_constraintVertical_bias="0"
             app:layout_constraintVertical_chainStyle="packed"
@@ -94,21 +96,23 @@
 
         <TextView
             android:id="@+id/item_rate"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/item_bare_min"
             app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
+            app:layout_constraintRight_toRightOf="@id/item_id"
             app:layout_constraintTop_toBottomOf="@id/item_id"
             tools:text="Rate: 0.86/dy"
             />
 
         <TextView
             android:id="@+id/item_bare_min"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
+            app:layout_constraintRight_toRightOf="@id/item_id"
             app:layout_constraintTop_toBottomOf="@id/item_rate"
             tools:text="+0.57 in 5 days"
             />
@@ -124,7 +128,7 @@
             android:paddingTop="3dp"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/item_timer"
             tools:text="4d"
             />
