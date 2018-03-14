@@ -1,11 +1,14 @@
 package me.cpele.watchbee.ui
 
+import android.app.TimePickerDialog
 import android.content.Context
 import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.TimePicker
+import android.widget.Toast
 import kotlinx.android.synthetic.main.view_item.view.*
 import me.cpele.watchbee.R
 import me.cpele.watchbee.domain.GoalTiming
@@ -42,13 +45,17 @@ class GoalViewHolder(
         itemView.item_timer.setOnLongClickListener {
             val wasRunning = stopwatch.running
             stopwatch.stop()
-            AlertDialog.Builder(context)
-                    .setMessage("Yo")
-                    .setPositiveButton("OK", { _, _ ->
+            TimePickerDialog(
+                    context,
+                    { timePicker: TimePicker, hours: Int, minutes: Int ->
+                        Toast.makeText(context, "Yo: $hours, $minutes", Toast.LENGTH_SHORT).show()
                         if (wasRunning) stopwatch.start()
                         listener.onPersist(goalTiming)
-                    })
-                    .show()
+                    },
+                    0,
+                    0,
+                    true
+            ).show()
             true
         }
         runnable?.let { handler.removeCallbacks(it) }
