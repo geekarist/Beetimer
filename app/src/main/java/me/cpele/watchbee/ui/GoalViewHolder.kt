@@ -40,11 +40,12 @@ class GoalViewHolder(
             listener.onPersist(goalTiming)
         }
         itemView.item_timer.setOnLongClickListener {
+            val wasRunning = stopwatch.running
             stopwatch.stop()
             AlertDialog.Builder(context)
                     .setMessage("Yo")
                     .setPositiveButton("OK", { _, _ ->
-                        stopwatch.start()
+                        if (wasRunning) stopwatch.start()
                         listener.onPersist(goalTiming)
                     })
                     .show()

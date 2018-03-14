@@ -1,7 +1,6 @@
 package me.cpele.watchbee.domain
 
 import android.support.annotation.ColorRes
-import android.util.Log
 import me.cpele.watchbee.R
 import java.util.concurrent.TimeUnit
 
@@ -36,13 +35,13 @@ class Stopwatch(
     }
 
     fun stop() {
-        Log.d(javaClass.simpleName, "Stopping ${toString()}")
+        if (!running) return
         stopTime = System.currentTimeMillis()
         running = false
     }
 
     fun start() {
-        Log.d(javaClass.simpleName, "Starting ${toString()}")
+        if (running) return
         elapsedPreviously += stopTime - startTime
         startTime = System.currentTimeMillis()
         running = true
