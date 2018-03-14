@@ -39,6 +39,17 @@ class GoalViewHolder(
             stopwatch.toggle()
             listener.onPersist(goalTiming)
         }
+        itemView.item_timer.setOnLongClickListener {
+            stopwatch.stop()
+            AlertDialog.Builder(context)
+                    .setMessage("Yo")
+                    .setPositiveButton("OK", { _, _ ->
+                        stopwatch.start()
+                        listener.onPersist(goalTiming)
+                    })
+                    .show()
+            true
+        }
         runnable?.let { handler.removeCallbacks(it) }
         runnable = Runnable {
             itemView.item_timer.text = stopwatch.format()
