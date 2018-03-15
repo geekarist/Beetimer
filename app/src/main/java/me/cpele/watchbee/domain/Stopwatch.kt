@@ -19,6 +19,14 @@ class Stopwatch(
                     else stopTime - startTime
         }
 
+    val hours: Int get() = TimeUnit.MILLISECONDS.toHours(elapsedMillis).toInt()
+
+    val minutes: Int get() {
+        return TimeUnit
+                .MILLISECONDS.toMinutes(elapsedMillis - TimeUnit.HOURS.toMillis(hours.toLong()))
+                .toInt()
+    }
+
     fun clear() {
         startTime = 0
         stopTime = 0
@@ -65,5 +73,12 @@ class Stopwatch(
             }
             true -> R.color.stopwatch_running
         }
+    }
+
+    fun set(hours: Int, minutes: Int) {
+        clear()
+        elapsedPreviously =
+                TimeUnit.HOURS.toMillis(hours.toLong()) +
+                TimeUnit.MINUTES.toMillis(minutes.toLong())
     }
 }

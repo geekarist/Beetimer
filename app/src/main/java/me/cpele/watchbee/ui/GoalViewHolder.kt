@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TimePicker
-import android.widget.Toast
 import kotlinx.android.synthetic.main.view_item.view.*
 import me.cpele.watchbee.R
 import me.cpele.watchbee.domain.GoalTiming
@@ -45,17 +44,22 @@ class GoalViewHolder(
         itemView.item_timer.setOnLongClickListener {
             val wasRunning = stopwatch.running
             stopwatch.stop()
-            TimePickerDialog(
+            val timePickerDialog = TimePickerDialog(
                     context,
-                    { timePicker: TimePicker, hours: Int, minutes: Int ->
-                        Toast.makeText(context, "Yo: $hours, $minutes", Toast.LENGTH_SHORT).show()
+                    { _: TimePicker, hours: Int, minutes: Int ->
+                        stopwatch.set(hours, minutes)
                         if (wasRunning) stopwatch.start()
                         listener.onPersist(goalTiming)
                     },
-                    0,
-                    0,
+                    stopwatch.hours,
+                    stopwatch.minutes,
                     true
-            ).show()
+            )
+            timePickerDialog.setOnCancelListener {
+                if (wasRunning) stopwatch.start()
+                listener.onPersist(goalTiming)
+            }
+            timePickerDialog.show()
             true
         }
         runnable?.let { handler.removeCallbacks(it) }
