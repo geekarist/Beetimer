@@ -6,6 +6,7 @@ import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.widget.TimePicker
 import kotlinx.android.synthetic.main.view_item.view.*
@@ -62,13 +63,8 @@ class GoalViewHolder(
             timePickerDialog.show()
             true
         }
-        runnable?.let { handler.removeCallbacks(it) }
-        runnable = Runnable {
-            itemView.item_timer.text = stopwatch.format()
-            itemView.item_timer.setTextColor(ContextCompat.getColor(context, stopwatch.color()))
-            handler.postDelayed(runnable, 1000)
-        }
-        handler.post(runnable)
+
+        attach()
 
         val color = goal.color
 
@@ -119,7 +115,18 @@ class GoalViewHolder(
         }
     }
 
-    fun release() {
+    fun attach() {
+        runnable?.let { handler.removeCallbacks(it) }
+        runnable = Runnable {
+            Log.d(javaClass.simpleName, "Updating stopwatch")
+            itemView.item_timer.text = stopwatch.format()
+            itemView.item_timer.setTextColor(ContextCompat.getColor(context, stopwatch.color()))
+            handler.postDelayed(runnable, 1000)
+        }
+        handler.post(runnable)
+    }
+
+    fun detach() {
         runnable?.let { handler.removeCallbacks(it) }
     }
 

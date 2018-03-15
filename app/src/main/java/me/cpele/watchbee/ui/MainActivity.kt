@@ -58,7 +58,19 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
 
         repository = CustomApp.instance.beeRepository
 
+        supportActionBar?.title = getString(R.string.app_name)
+
+        if (savedInstanceState == null) {
+            viewModel.refresh()
+            sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
+        }
+
         mAdapter = GoalAdapter(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
         main_rv.adapter = mAdapter
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -66,13 +78,6 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         } else {
             main_rv.layoutManager = GridLayoutManager(this, 2)
             main_rv.addItemDecoration(CenterMarginFix())
-        }
-
-        supportActionBar?.title = getString(R.string.app_name)
-
-        if (savedInstanceState == null) {
-            viewModel.refresh()
-            sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
         }
     }
 
@@ -183,6 +188,11 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         item?.actionView?.clearAnimation()
         item?.actionView = null
         item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
+    }
+
+    override fun onPause() {
+        main_rv.adapter = null
+        super.onPause()
     }
 }
 

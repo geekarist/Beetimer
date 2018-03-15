@@ -20,8 +20,13 @@ class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.
         return GoalViewHolder(itemView, listener)
     }
 
+    override fun onViewAttachedToWindow(holder: GoalViewHolder?) {
+        super.onViewAttachedToWindow(holder)
+        holder?.attach()
+    }
+
     override fun onViewRecycled(holder: GoalViewHolder?) {
-        holder?.release()
+        holder?.detach()
     }
 
     override fun getItemCount(): Int = items.size
@@ -33,4 +38,9 @@ class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.
     }
 
     fun isEmpty(): Boolean = items.isEmpty()
+
+    override fun onViewDetachedFromWindow(holder: GoalViewHolder?) {
+        holder?.detach()
+        super.onViewDetachedFromWindow(holder)
+    }
 }
