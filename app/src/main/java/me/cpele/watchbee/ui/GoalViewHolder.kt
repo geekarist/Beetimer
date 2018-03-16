@@ -29,6 +29,8 @@ class GoalViewHolder(
 
     fun bind(goalTiming: GoalTiming) {
 
+        if (itemView.tag == null) return
+
         val bound = ViewItemBinding.bind(itemView)
         bound.model = goalTiming.goal
 
