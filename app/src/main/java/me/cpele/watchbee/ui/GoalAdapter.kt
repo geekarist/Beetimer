@@ -10,14 +10,15 @@ class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.
 
     private var items: MutableList<GoalTiming> = mutableListOf()
 
-    override fun onBindViewHolder(holder: GoalViewHolder?, position: Int) {
-        holder?.bind(items[position])
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): GoalViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
         val itemView = inflater.inflate(R.layout.view_item, parent, false)
         return GoalViewHolder(itemView, listener)
+    }
+
+    override fun onBindViewHolder(holder: GoalViewHolder?, position: Int) {
+        val goalTiming = items[position]
+        holder?.bind(goalTiming)
     }
 
     override fun onViewAttachedToWindow(holder: GoalViewHolder?) {
