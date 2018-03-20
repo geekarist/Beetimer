@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import me.cpele.watchbee.R
+import me.cpele.watchbee.databinding.ViewItemBinding
 import me.cpele.watchbee.domain.GoalTiming
 
 class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.Adapter<GoalViewHolder>() {
@@ -13,7 +14,8 @@ class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): GoalViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
         val itemView = inflater.inflate(R.layout.view_item, parent, false)
-        return GoalViewHolder(itemView, listener)
+        val itemBinding = ViewItemBinding.bind(itemView)
+        return GoalViewHolder(itemBinding, listener)
     }
 
     override fun onBindViewHolder(holder: GoalViewHolder?, position: Int) {

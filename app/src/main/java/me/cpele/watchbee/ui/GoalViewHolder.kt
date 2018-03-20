@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.View
 import android.widget.TimePicker
 import kotlinx.android.synthetic.main.view_item.view.*
 import me.cpele.watchbee.databinding.ViewItemBinding
@@ -15,9 +14,9 @@ import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.Stopwatch
 
 class GoalViewHolder(
-        itemView: View?,
+        private val itemBinding: ViewItemBinding,
         private val listener: Listener
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(itemBinding.root) {
 
     private val context: Context
         get() = itemView.context
@@ -29,10 +28,7 @@ class GoalViewHolder(
 
     fun bind(goalTiming: GoalTiming) {
 
-        if (itemView.tag == null) return
-
-        val bound = ViewItemBinding.bind(itemView)
-        bound.model = goalTiming.goal
+        itemBinding.model = goalTiming.goal
 
         stopwatch = goalTiming.stopwatch
         itemView.item_timer.setOnClickListener {
