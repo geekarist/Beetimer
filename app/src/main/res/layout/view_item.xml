@@ -6,7 +6,12 @@
 
         <variable
             name="model"
-            type="me.cpele.watchbee.api.Goal"
+            type="me.cpele.watchbee.domain.GoalTiming"
+            />
+
+        <variable
+            name="listener"
+            type="me.cpele.watchbee.ui.GoalViewHolder"
             />
     </data>
 
@@ -35,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="15dp"
-                android:text="@{model.title}"
+                android:text="@{model.goal.title}"
                 android:textAlignment="center"
                 tools:text="Learn to be a more efficient developer"/>
 
@@ -54,6 +59,8 @@
                 android:layout_marginStart="12dp"
                 android:width="@dimen/item_timer_width"
                 android:gravity="center"
+                android:onClick="@{() -> listener.onClickTimer(model)}"
+                android:onLongClick="@{() -> listener.onLongClickTimer(model)}"
                 android:textSize="@dimen/item_timer_text_size"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/item_title"
@@ -67,6 +74,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
+                android:onClick="@{() -> listener.onClickSubmit(model)}"
                 android:padding="0dp"
                 android:text="@string/item_submit"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -82,6 +90,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
+                android:onClick="@{() -> listener.onClickReset(model)}"
                 android:padding="0dp"
                 android:text="@string/item_reset"
                 app:layout_constraintLeft_toRightOf="@id/item_submit"
@@ -94,7 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:text="@{model.slug}"
+                android:text="@{model.goal.slug}"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@id/item_rate"
                 app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
@@ -109,7 +118,7 @@
                 android:id="@+id/item_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{@string/item_rate(model.rate, model.runits)}"
+                android:text="@{@string/item_rate(model.goal.rate, model.goal.runits)}"
                 app:layout_constraintBottom_toTopOf="@id/item_bare_min"
                 app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
                 app:layout_constraintRight_toRightOf="@id/item_id"
@@ -121,7 +130,7 @@
                 android:id="@+id/item_bare_min"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{model.limsum}"
+                android:text="@{model.goal.limsum}"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
@@ -136,10 +145,9 @@
                 android:layout_width="76sp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
-                android:background="@{context.resources.getColor(model.color)}"
+                android:background="@{context.resources.getColor(model.goal.color)}"
                 android:paddingTop="3dp"
-                android:text="@{@string/item_derail_date(model.derailDays)}"
+                android:text="@{@string/item_derail_date(model.goal.derailDays)}"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 app:layout_constraintRight_toRightOf="parent"
@@ -153,10 +161,9 @@
                 android:layout_width="76sp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
-                android:background="@{context.resources.getColor(model.color)}"
+                android:background="@{context.resources.getColor(model.goal.color)}"
                 android:paddingBottom="5dp"
-                android:text="@{@string/item_derail_time(model.derailHours, model.derailMin, model.derailSec)}"
+                android:text="@{@string/item_derail_time(model.goal.derailHours, model.goal.derailMin, model.goal.derailSec)}"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
