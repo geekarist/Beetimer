@@ -44,20 +44,21 @@ class BeeRepository(context: Context, private val executor: Executor) {
     private val statusChangeDao: StatusChangeDao = database.statusDao()
     private val pendingDatapointDao: PendingDatapointDao = database.pendingDatapointDao()
 
-    val latestStatus: LiveData<StatusChange> get() {
-        val distinctLiveData = MediatorLiveData<StatusChange>()
-        distinctLiveData.addSource(statusChangeDao.findLatestStatus(), object: Observer<StatusChange> {
-            var previousValue: StatusChange? = null
-            override fun onChanged(value: StatusChange?) {
-                val isChanging = value?.status != previousValue?.status
-                if (isChanging) {
-                    previousValue = value
-                    distinctLiveData.value = value
+    val latestStatus: LiveData<StatusChange>
+        get() {
+            val distinctLiveData = MediatorLiveData<StatusChange>()
+            distinctLiveData.addSource(statusChangeDao.findLatestStatus(), object : Observer<StatusChange> {
+                var previousValue: StatusChange? = null
+                override fun onChanged(value: StatusChange?) {
+                    val isChanging = value?.status != previousValue?.status
+                    if (isChanging) {
+                        previousValue = value
+                        distinctLiveData.value = value
+                    }
                 }
-            }
-        })
-        return distinctLiveData
-    }
+            })
+            return distinctLiveData
+        }
 
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
 
@@ -70,8 +71,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     goalTiming.goal = goal
                     goalTiming
                 }.let { goalTimings ->
-                            goalTimingDao.insert(goalTimings)
-                        }
+                    goalTimingDao.insert(goalTimings)
+                }
                 callback()
             }
 
@@ -227,10 +228,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
             }
             callback()
         }
-    }
-
-    fun isAnyTimerRunning(): LiveData<Boolean> {
-        return goalTimingDao.isAnyoneRunning()
     }
 }
 

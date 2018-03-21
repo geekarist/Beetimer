@@ -79,6 +79,8 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
             main_rv.layoutManager = GridLayoutManager(this, 2)
             main_rv.addItemDecoration(CenterMarginFix())
         }
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onPersist(goalTiming: GoalTiming) {
@@ -110,12 +112,6 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
             Log.d(localClassName, "Activity received goals: $it")
             supportActionBar?.subtitle = it?.firstOrNull()?.user
             mAdapter.refresh(it ?: emptyList())
-        })
-
-        viewModel.isAnyTimerRunning.observe(this, Observer {
-            Log.d(localClassName, "Running status changed for a timer to: $it")
-            if (it == true) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         })
 
         return displayMenu
@@ -191,6 +187,7 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
     }
 
     override fun onPause() {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         main_rv.adapter = null
         super.onPause()
     }
