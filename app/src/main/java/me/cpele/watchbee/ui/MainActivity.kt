@@ -186,10 +186,18 @@ class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
         item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
     }
 
+    override fun onOpen(goalTiming: GoalTiming) {
+        DetailActivity.start(this, goalTiming.goal.slug)
+    }
+
     override fun onPause() {
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         main_rv.adapter = null
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }
 

@@ -45,6 +45,11 @@
 
         </activity>
 
+        <activity
+            android:name=".ui.DetailActivity"
+            android:parentActivityName=".ui.MainActivity"
+            />
+
         <service
             android:name=".ui.BeeJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"

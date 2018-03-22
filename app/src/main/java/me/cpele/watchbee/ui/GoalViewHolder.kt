@@ -47,6 +47,10 @@ class GoalViewHolder(
         handler.post(runnable)
     }
 
+    fun onClickItem(goalTiming: GoalTiming) {
+        listener.onOpen(goalTiming);
+    }
+
     fun onClickTimer(goalTiming: GoalTiming) {
         stopwatch.toggle()
         listener.onPersist(goalTiming)
@@ -98,5 +102,6 @@ class GoalViewHolder(
     interface Listener {
         fun onPersist(goalTiming: GoalTiming)
         fun onSubmit(goalTiming: GoalTiming)
+        fun onOpen(goalTiming: GoalTiming)
     }
 }
