@@ -1,12 +1,13 @@
 package me.cpele.watchbee.ui
 
-import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import me.cpele.watchbee.databinding.ViewItemBinding
+import me.cpele.watchbee.R
+import me.cpele.watchbee.databinding.ActivityDetailBinding
 
 class DetailActivity : AppCompatActivity() {
 
@@ -30,13 +31,17 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ViewItemBinding.inflate(layoutInflater)
-        CustomApp.instance.beeRepository
-                .asyncFindGoalTimingBySlug(slug)
-                .observe(this, Observer {
-                    binding.model = it
-                    setContentView(binding.root)
-                })
+        val view = layoutInflater.inflate(R.layout.activity_detail, null, false)
+        val binding = ActivityDetailBinding.bind(view)
+        binding.setLifecycleOwner(this)
+        binding.model = ViewModelProviders.of(
+                this,
+                DetailViewModel.Factory(
+                        CustomApp.instance.beeRepository,
+                        slug
+                )
+        ).get(DetailViewModel::class.java)
+        setContentView(view)
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
     }
 
