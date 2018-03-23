@@ -1,11 +1,12 @@
 package me.cpele.watchbee.ui
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import android.widget.TextView
+import me.cpele.watchbee.databinding.ViewItemBinding
 
 class DetailActivity : AppCompatActivity() {
 
@@ -20,9 +21,22 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    val slug: String
+        get () {
+            return intent.getStringExtra(ARG_SLUG)
+                    ?: throw IllegalStateException(
+                            "Slug should not be null. Did you use the start() method for instantiation?")
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(TextView(this).apply { text = "Yo" })
+        val binding = ViewItemBinding.inflate(layoutInflater)
+        CustomApp.instance.beeRepository
+                .asyncFindGoalTimingBySlug(slug)
+                .observe(this, Observer {
+                    binding.model = it
+                    setContentView(binding.root)
+                })
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
     }
 

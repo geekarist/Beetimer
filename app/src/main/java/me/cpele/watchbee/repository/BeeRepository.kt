@@ -229,5 +229,11 @@ class BeeRepository(context: Context, private val executor: Executor) {
             callback()
         }
     }
+
+    fun findGoalTimingBySlug(slug: String): GoalTiming? = goalTimingDao.findOneBySlug(slug)
+
+    fun asyncFindGoalTimingBySlug(slug: String): LiveData<GoalTiming> {
+        return goalTimingDao.asyncFindOneBySlug(slug)
+    }
 }
 

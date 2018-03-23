@@ -18,6 +18,9 @@ interface GoalTimingDao {
     @Query("SELECT * FROM GoalTiming WHERE slug = :slug")
     fun findOneBySlug(slug: String): GoalTiming?
 
+    @Query("SELECT * FROM GoalTiming WHERE slug = :slug")
+    fun asyncFindOneBySlug(slug: String): LiveData<GoalTiming>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOne(goalTiming: GoalTiming)
 }
