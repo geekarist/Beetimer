@@ -52,11 +52,6 @@ class DetailActivity : AppCompatActivity() {
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.fetch()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
