@@ -29,20 +29,32 @@ class DetailActivity : AppCompatActivity() {
                             "Slug should not be null. Did you use the start() method for instantiation?")
         }
 
+    private val viewModel: DetailViewModel
+        get() {
+            return ViewModelProviders.of(
+                    this,
+                    DetailViewModel.Factory(
+                            CustomApp.instance.beeRepository,
+                            slug
+                    )
+            ).get(DetailViewModel::class.java)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val view = layoutInflater.inflate(R.layout.activity_detail, null, false)
+
         val binding = ActivityDetailBinding.bind(view)
         binding.setLifecycleOwner(this)
-        binding.model = ViewModelProviders.of(
-                this,
-                DetailViewModel.Factory(
-                        CustomApp.instance.beeRepository,
-                        slug
-                )
-        ).get(DetailViewModel::class.java)
+        binding.model = viewModel
+
         setContentView(view)
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.fetch()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
