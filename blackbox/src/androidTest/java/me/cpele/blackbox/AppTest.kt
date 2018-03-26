@@ -8,21 +8,23 @@ import android.support.test.uiautomator.UiDevice
 import android.support.test.uiautomator.Until
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class DisplayDatapointsTest {
+class AppTest {
 
     companion object {
         const val TIMEOUT = 10_000L;
+        val START_TIMEOUT = TimeUnit.HOURS.toMillis(1);
     }
 
     @Test
-    fun should_display_datapoints() {
+    fun gh4() {
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-        device.wait(Until.findObject(By.res("me.cpele.watchbee:id/main_menu_sync")), TIMEOUT).click()
-        device.wait(Until.findObject(By.res("me.cpele.watchbee:id/item_title")), TIMEOUT).click()
+        device.wait(Until.findObject(By.res("me.cpele.watchbee:id/item_title")), START_TIMEOUT)
+                .click()
     }
 }
