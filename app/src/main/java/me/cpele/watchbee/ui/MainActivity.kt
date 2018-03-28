@@ -27,7 +27,7 @@ import me.cpele.watchbee.repository.BeeRepository
 
 private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 
-class MainActivity : AppCompatActivity(), GoalViewHolder.Listener {
+class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
 
     private lateinit var mAdapter: GoalAdapter
     private var mMenu: Menu? = null

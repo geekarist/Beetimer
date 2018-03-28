@@ -11,7 +11,7 @@
 
         <variable
             name="listener"
-            type="me.cpele.watchbee.ui.GoalViewHolder"
+            type="me.cpele.watchbee.ui.GoalViewListener"
             />
     </data>
 

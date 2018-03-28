@@ -7,28 +7,29 @@ import me.cpele.watchbee.R
 import me.cpele.watchbee.databinding.ViewItemBinding
 import me.cpele.watchbee.domain.GoalTiming
 
-class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.Adapter<GoalViewHolder>() {
+class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener)
+    : RecyclerView.Adapter<GoalRecyclerViewHolder>() {
 
     private var items: MutableList<GoalTiming> = mutableListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): GoalViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): GoalRecyclerViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
         val itemView = inflater.inflate(R.layout.view_item, parent, false)
         val itemBinding = ViewItemBinding.bind(itemView)
-        return GoalViewHolder(itemBinding, listener)
+        return GoalRecyclerViewHolder(itemBinding, listener)
     }
 
-    override fun onBindViewHolder(holder: GoalViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: GoalRecyclerViewHolder?, position: Int) {
         val goalTiming = items[position]
         holder?.bind(goalTiming)
     }
 
-    override fun onViewAttachedToWindow(holder: GoalViewHolder?) {
+    override fun onViewAttachedToWindow(holder: GoalRecyclerViewHolder?) {
         super.onViewAttachedToWindow(holder)
         holder?.attach()
     }
 
-    override fun onViewRecycled(holder: GoalViewHolder?) {
+    override fun onViewRecycled(holder: GoalRecyclerViewHolder?) {
         holder?.detach()
     }
 
@@ -42,7 +43,7 @@ class GoalAdapter(private val listener: GoalViewHolder.Listener) : RecyclerView.
 
     fun isEmpty(): Boolean = items.isEmpty()
 
-    override fun onViewDetachedFromWindow(holder: GoalViewHolder?) {
+    override fun onViewDetachedFromWindow(holder: GoalRecyclerViewHolder?) {
         holder?.detach()
         super.onViewDetachedFromWindow(holder)
     }
