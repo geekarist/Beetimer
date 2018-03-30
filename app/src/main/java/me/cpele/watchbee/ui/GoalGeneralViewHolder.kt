@@ -13,7 +13,7 @@ import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.Stopwatch
 
 class GoalGeneralViewHolder(
-        val itemBinding: ViewItemBinding,
+        private val itemBinding: ViewItemBinding,
         private val listener: Listener
 ) : GoalViewListener {
 

@@ -5,15 +5,13 @@ import me.cpele.watchbee.databinding.ViewItemBinding
 import me.cpele.watchbee.domain.GoalTiming
 
 class GoalRecyclerViewHolder(
-        private val binding: ViewItemBinding,
+        binding: ViewItemBinding,
         listener: GoalGeneralViewHolder.Listener
 ) : RecyclerView.ViewHolder(binding.root), GoalViewListener {
 
     private var generalViewHolder = GoalGeneralViewHolder(binding, listener)
 
-    fun bind(goalTiming: GoalTiming) {
-        generalViewHolder.bind(goalTiming)
-    }
+    fun bind(goalTiming: GoalTiming) = generalViewHolder.bind(goalTiming)
 
     fun attach() = generalViewHolder.attach()
 
@@ -26,7 +24,5 @@ class GoalRecyclerViewHolder(
         return generalViewHolder.onLongClickTimer(goalTiming)
     }
 
-    fun detach() {
-        generalViewHolder.detach()
-    }
+    fun detach() = generalViewHolder.detach()
 }
