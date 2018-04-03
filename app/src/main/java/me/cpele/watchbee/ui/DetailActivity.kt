@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.widget.Toast
 import me.cpele.watchbee.R
 import me.cpele.watchbee.databinding.ActivityDetailBinding
 
@@ -57,6 +58,7 @@ class DetailActivity : AppCompatActivity() {
         val binding = ActivityDetailBinding.bind(view)
         binding.setLifecycleOwner(this)
         binding.model = viewModel
+        binding.listener = this;
 
         setContentView(view)
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
@@ -75,6 +77,10 @@ class DetailActivity : AppCompatActivity() {
             }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    fun onTimerToggle() {
+        Toast.makeText(this, "Yo", Toast.LENGTH_SHORT).show()
     }
 
     override fun onPause() {
