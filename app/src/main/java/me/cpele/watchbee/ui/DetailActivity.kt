@@ -41,6 +41,15 @@ class DetailActivity : AppCompatActivity() {
             ).get(DetailViewModel::class.java)
         }
 
+    private val handler = Handler()
+
+    private val runnableForceRefresh: Runnable = object : Runnable {
+        override fun run() {
+            viewModel.forceRefresh()
+            handler.postDelayed(this, 1000)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val view = layoutInflater.inflate(R.layout.activity_detail, null, false)
@@ -53,16 +62,9 @@ class DetailActivity : AppCompatActivity() {
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
     }
 
-    private val runnableForceRefresh: Runnable = object : Runnable {
-        override fun run() {
-            viewModel.forceRefresh()
-            Handler().postDelayed(this, 1000)
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        Handler().post(runnableForceRefresh)
+        handler.post(runnableForceRefresh)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -77,6 +79,6 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        Handler().removeCallbacks(runnableForceRefresh)
+        handler.removeCallbacks(runnableForceRefresh)
     }
 }
