@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import me.cpele.watchbee.R
@@ -52,6 +53,18 @@ class DetailActivity : AppCompatActivity() {
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
     }
 
+    private val runnableForceRefresh: Runnable = object : Runnable {
+        override fun run() {
+            viewModel.forceRefresh()
+            Handler().postDelayed(this, 1000)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Handler().post(runnableForceRefresh)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
@@ -60,5 +73,10 @@ class DetailActivity : AppCompatActivity() {
             }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Handler().removeCallbacks(runnableForceRefresh)
     }
 }

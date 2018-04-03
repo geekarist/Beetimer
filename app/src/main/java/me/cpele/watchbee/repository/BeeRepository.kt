@@ -235,5 +235,13 @@ class BeeRepository(context: Context, private val executor: Executor) {
     fun asyncFindGoalTimingBySlug(slug: String): LiveData<GoalTiming> {
         return goalTimingDao.asyncFindOneBySlug(slug)
     }
+
+    fun forceRefreshGoalTimingBySlug(slug: String) {
+        executor.execute {
+            goalTimingDao
+                    .findOneBySlug(slug)
+                    ?.let { goalTimingDao.insertOne(it) }
+        }
+    }
 }
 

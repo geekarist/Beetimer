@@ -13,6 +13,10 @@ class DetailViewModel(
 
     val goalTiming: LiveData<GoalTiming> = beeRepository.asyncFindGoalTimingBySlug(slug)
 
+    fun forceRefresh() {
+        beeRepository.forceRefreshGoalTimingBySlug(slug)
+    }
+
     class Factory(
             private val beeRepository: BeeRepository,
             private val slug: String
