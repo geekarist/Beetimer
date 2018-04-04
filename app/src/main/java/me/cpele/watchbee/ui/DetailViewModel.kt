@@ -33,8 +33,12 @@ class DetailViewModel(
         beeRepository.forceRefreshGoalTimingBySlug(slug)
     }
 
-    fun toggleStopwatch() {
+    fun onToggle() {
         beeRepository.asyncToggleStopwatch(slug)
+    }
+
+    fun onCancel() {
+        beeRepository.asyncCancelStopwatch(slug)
     }
 
     class Factory(

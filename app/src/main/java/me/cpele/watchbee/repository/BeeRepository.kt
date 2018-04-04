@@ -254,5 +254,15 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
         }
     }
+
+    fun asyncCancelStopwatch(slug: String) {
+        executor.execute {
+            val goalTiming = goalTimingDao.findOneBySlug(slug)
+            goalTiming?.stopwatch?.apply {
+                clear()
+                persist(goalTiming)
+            }
+        }
+    }
 }
 
