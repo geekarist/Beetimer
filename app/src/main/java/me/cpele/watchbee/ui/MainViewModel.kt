@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
+import android.preference.PreferenceManager
 import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.StatusChange
 import me.cpele.watchbee.repository.BeeRepository
@@ -28,6 +29,13 @@ class MainViewModel(
 
     fun persist(goalTiming: GoalTiming) = repository.persist(goalTiming)
 
-    fun submit(context: Context, goalTiming: GoalTiming) = repository.submit(context, goalTiming)
+    fun submit(context: Context, goalTiming: GoalTiming) {
+        repository.submit(
+                goalTiming,
+                PreferenceManager
+                        .getDefaultSharedPreferences(context)
+                        .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
+        )
+    }
 }
 

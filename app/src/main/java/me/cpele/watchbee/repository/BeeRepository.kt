@@ -7,7 +7,6 @@ import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
 import android.content.Context
-import android.preference.PreferenceManager
 import android.util.Log
 import me.cpele.watchbee.api.Datapoint
 import me.cpele.watchbee.api.Goal
@@ -18,7 +17,6 @@ import me.cpele.watchbee.database.dao.PendingDatapointDao
 import me.cpele.watchbee.database.dao.StatusChangeDao
 import me.cpele.watchbee.domain.*
 import me.cpele.watchbee.ui.CustomApp
-import me.cpele.watchbee.ui.SignInActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -141,15 +139,12 @@ class BeeRepository(context: Context, private val executor: Executor) {
         updateGoalTiming(goalTiming)
     }
 
-    fun submit(context: Context, goalTiming: GoalTiming) {
+    fun submit(goalTiming: GoalTiming, accessToken: String) {
 
         val userName = goalTiming.user
         val goalSlug = goalTiming.goal.slug
         val datapointValue = goalTiming.stopwatch.elapsedDecimalMinutes
         val comment = "via WatchBee at ${Date()}"
-        val accessToken = PreferenceManager
-                .getDefaultSharedPreferences(context)
-                .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
 
         goalTiming.stopwatch.clear()
         persist(goalTiming)
@@ -261,6 +256,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
             goalTiming?.stopwatch?.apply {
                 clear()
                 persist(goalTiming)
+            }
+        }
+    }
+
+    fun asyncSubmit(slug: String, accessToken: String) {
+        executor.execute {
+            val goalTiming = goalTimingDao.findOneBySlug(slug)
+            goalTiming?.apply {
+                submit(this, accessToken)
+                persist(this)
             }
         }
     }

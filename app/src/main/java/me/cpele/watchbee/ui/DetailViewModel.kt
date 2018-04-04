@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.preference.PreferenceManager
 import me.cpele.watchbee.R
 import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.repository.BeeRepository
@@ -39,6 +40,15 @@ class DetailViewModel(
 
     fun onCancel() {
         beeRepository.asyncCancelStopwatch(slug)
+    }
+
+    fun onSubmit(context: Context) {
+        beeRepository.asyncSubmit(
+                slug,
+                PreferenceManager
+                        .getDefaultSharedPreferences(context)
+                        .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
+        )
     }
 
     class Factory(

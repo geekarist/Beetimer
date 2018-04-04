@@ -87,6 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/detail_submit"
+            android:onClick="@{() -> model.onSubmit(context)}"
             android:src="@drawable/ic_done_black_24dp"
             app:layout_constraintBottom_toBottomOf="@id/detail_button_start_stop"
             app:layout_constraintLeft_toRightOf="@id/detail_button_start_stop"
