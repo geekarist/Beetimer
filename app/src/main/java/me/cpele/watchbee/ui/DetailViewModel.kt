@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
 import me.cpele.watchbee.R
 import me.cpele.watchbee.domain.GoalTiming
+import me.cpele.watchbee.domain.StatusChange
 import me.cpele.watchbee.repository.BeeRepository
 
 class DetailViewModel(
@@ -17,6 +18,7 @@ class DetailViewModel(
 ) : ViewModel() {
 
     val goalTiming: LiveData<GoalTiming> = beeRepository.asyncFindGoalTimingBySlug(slug)
+    val status: LiveData<StatusChange> = beeRepository.latestStatus
 
     fun startStopDrawable(context: Context): LiveData<Drawable> {
         val drawableData = MediatorLiveData<Drawable>()

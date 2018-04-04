@@ -1,5 +1,6 @@
 package me.cpele.watchbee.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -18,7 +19,7 @@ class SignInActivity : AppCompatActivity() {
         const val PREF_ACCESS_TOKEN = "ACCESS_TOKEN"
         private const val EXTRA_CLEAR_TOKEN = "EXTRA_CLEAR_TOKEN"
 
-        fun start(context: MainActivity, clearToken: Boolean) {
+        fun start(context: Activity, clearToken: Boolean) {
             val intent = Intent(context, SignInActivity::class.java)
             intent.putExtra(EXTRA_CLEAR_TOKEN, clearToken)
             context.startActivity(intent)
