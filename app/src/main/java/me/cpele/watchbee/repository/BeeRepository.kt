@@ -243,5 +243,16 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     ?.let { goalTimingDao.insertOne(it) }
         }
     }
+
+    fun asyncToggleStopwatch(slug: String) {
+        executor.execute {
+            val goalTiming = goalTimingDao.findOneBySlug(slug)
+            goalTiming?.stopwatch?.apply {
+                toggle()
+                persist(goalTiming)
+            }
+
+        }
+    }
 }
 

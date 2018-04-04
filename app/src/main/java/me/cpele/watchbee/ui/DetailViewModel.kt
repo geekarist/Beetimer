@@ -33,6 +33,10 @@ class DetailViewModel(
         beeRepository.forceRefreshGoalTimingBySlug(slug)
     }
 
+    fun toggleStopwatch() {
+        beeRepository.asyncToggleStopwatch(slug)
+    }
+
     class Factory(
             private val beeRepository: BeeRepository,
             private val slug: String
