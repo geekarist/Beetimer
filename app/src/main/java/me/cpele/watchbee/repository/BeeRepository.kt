@@ -170,7 +170,11 @@ class BeeRepository(context: Context, private val executor: Executor) {
                         val tag = BeeRepository::class.java.simpleName
                         Log.e(tag, "Error posting goal timing: ", t)
                         if (indicateStatusChange) {
-                            insertStatusChange(StatusChange(status = Status.FAILURE))
+                            insertStatusChange(StatusChange(
+                                    status = Status.FAILURE,
+                                    message =
+                                    "Submission failed: datapoint stored locally until next sync"
+                            ))
                         }
                         enqueueDatapoint(userName, goalSlug, datapointValue, comment)
                     }
