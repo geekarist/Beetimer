@@ -31,10 +31,21 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@{model.goalTiming.goal.title}"
+            app:layout_constraintBottom_toTopOf="@+id/detail_datapoints"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Goal title"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/detail_datapoints"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#dddddd"
+            app:layout_constraintBottom_toTopOf="@id/detail_timer"
+            app:layout_constraintTop_toBottomOf="@id/detail_title"
+            tools:listitem="@layout/view_detail_item"
             />
 
         <TextView
