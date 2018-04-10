@@ -8,12 +8,14 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
 import me.cpele.watchbee.R
+import me.cpele.watchbee.domain.DatapointBo
 import me.cpele.watchbee.domain.GoalTiming
 import me.cpele.watchbee.domain.StatusChange
 import me.cpele.watchbee.repository.BeeRepository
 
 class DetailViewModel(
         private val beeRepository: BeeRepository,
+        private val userName: String,
         private val slug: String
 ) : ViewModel() {
 
@@ -53,12 +55,17 @@ class DetailViewModel(
         )
     }
 
+    fun findDatapoints(): LiveData<List<DatapointBo>> {
+        return beeRepository.asyncFindDatapointsBySlug(userName, slug)
+    }
+
     class Factory(
             private val beeRepository: BeeRepository,
+            private val userName: String,
             private val slug: String
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return modelClass.cast(DetailViewModel(beeRepository, slug))
+            return modelClass.cast(DetailViewModel(beeRepository, userName, slug))
         }
     }
 }

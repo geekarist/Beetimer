@@ -19,19 +19,28 @@ class DetailActivity : AppCompatActivity() {
     companion object {
 
         private const val ARG_SLUG = "ARG_SLUG"
+        private const val ARG_USER_NAME = "ARG_USER_NAME"
 
-        fun start(context: Context, slug: String) {
+        fun start(context: Context, userName: String, slug: String) {
             val intent = Intent(context, DetailActivity::class.java)
             intent.putExtra(ARG_SLUG, slug)
+            intent.putExtra(ARG_USER_NAME, userName)
             context.startActivity(intent)
         }
     }
 
-    val slug: String
+    private val slug: String
         get () {
             return intent.getStringExtra(ARG_SLUG)
                     ?: throw IllegalStateException(
                             "Slug should not be null. Did you use the start() method for instantiation?")
+        }
+
+    private val userName: String
+        get () {
+            return intent.getStringExtra(ARG_USER_NAME)
+                    ?: throw IllegalStateException(
+                            "User name should not be null. Did you use the start() method for instantiation?")
         }
 
     private val viewModel: DetailViewModel
@@ -40,6 +49,7 @@ class DetailActivity : AppCompatActivity() {
                     this,
                     DetailViewModel.Factory(
                             CustomApp.instance.beeRepository,
+                            userName,
                             slug
                     )
             ).get(DetailViewModel::class.java)
@@ -80,6 +90,9 @@ class DetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         handler.post(runnableForceRefresh)
+        viewModel.findDatapoints().observe(this, Observer {
+            Log.d(localClassName, "I'm seeing ${it?.size} datapoints")
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

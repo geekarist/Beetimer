@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
     }
 
     override fun onOpen(goalTiming: GoalTiming) {
-        DetailActivity.start(this, goalTiming.goal.slug)
+        DetailActivity.start(this, goalTiming.user, goalTiming.goal.slug)
     }
 
     override fun onPause() {

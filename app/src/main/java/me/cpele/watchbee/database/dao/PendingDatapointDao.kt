@@ -1,5 +1,6 @@
 package me.cpele.watchbee.database.dao
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Delete
 import android.arch.persistence.room.Insert
@@ -17,4 +18,7 @@ interface PendingDatapointDao {
 
     @Delete
     fun deleteOne(datapoint: DatapointBo)
+
+    @Query("SELECT * FROM PendingDatapoint WHERE userName = :userName AND goalSlug = :slug")
+    fun findBySlug(userName: String, slug: String): LiveData<List<DatapointBo>>
 }

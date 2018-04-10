@@ -273,5 +273,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
             }
         }
     }
+
+    fun asyncFindDatapointsBySlug(slug: String, userName: String): LiveData<List<DatapointBo>> {
+        return pendingDatapointDao.findBySlug(userName, slug);
+    }
 }
 

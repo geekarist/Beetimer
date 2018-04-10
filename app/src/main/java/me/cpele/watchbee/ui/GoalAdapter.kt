@@ -12,25 +12,25 @@ class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener)
 
     private var items: MutableList<GoalTiming> = mutableListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): GoalRecyclerViewHolder {
-        val inflater = LayoutInflater.from(parent?.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GoalRecyclerViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         val itemView = inflater.inflate(R.layout.view_item, parent, false)
         val itemBinding = ViewItemBinding.bind(itemView)
         return GoalRecyclerViewHolder(itemBinding, listener)
     }
 
-    override fun onBindViewHolder(holder: GoalRecyclerViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: GoalRecyclerViewHolder, position: Int) {
         val goalTiming = items[position]
-        holder?.bind(goalTiming)
+        holder.bind(goalTiming)
     }
 
-    override fun onViewAttachedToWindow(holder: GoalRecyclerViewHolder?) {
+    override fun onViewAttachedToWindow(holder: GoalRecyclerViewHolder) {
         super.onViewAttachedToWindow(holder)
-        holder?.attach()
+        holder.attach()
     }
 
-    override fun onViewRecycled(holder: GoalRecyclerViewHolder?) {
-        holder?.detach()
+    override fun onViewRecycled(holder: GoalRecyclerViewHolder) {
+        holder.detach()
     }
 
     override fun getItemCount(): Int = items.size
@@ -43,8 +43,8 @@ class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener)
 
     fun isEmpty(): Boolean = items.isEmpty()
 
-    override fun onViewDetachedFromWindow(holder: GoalRecyclerViewHolder?) {
-        holder?.detach()
+    override fun onViewDetachedFromWindow(holder: GoalRecyclerViewHolder) {
+        holder.detach()
         super.onViewDetachedFromWindow(holder)
     }
 }

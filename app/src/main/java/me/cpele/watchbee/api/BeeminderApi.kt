@@ -25,5 +25,12 @@ interface BeeminderApi {
             @Query("comment") comment: String,
             @Query("access_token") accessToken: String
     ): Call<Datapoint>
+
+    @GET("/api/v1/users/{user}/goals/{goal}/datapoints.json")
+    fun getDataPoints(
+            @Path("user") userName: String,
+            @Path("goal") slug: String,
+            @Query("access_token") accessToken: String
+    )
 }
 
