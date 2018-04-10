@@ -9,5 +9,6 @@ data class DatapointBo(
         val userName: String,
         val goalSlug: String,
         val datapointValue: Float,
-        val comment: String
+        val comment: String,
+        var pending: Boolean
 )

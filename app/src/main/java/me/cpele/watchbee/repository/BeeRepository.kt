@@ -201,7 +201,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     userName = userName,
                     goalSlug = goalSlug,
                     datapointValue = datapointValue,
-                    comment = comment
+                    comment = comment,
+                    pending = true
             )
             pendingDatapointDao.insertOne(datapoint)
         }
@@ -209,10 +210,11 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private fun postQueuedDatapoints(accessToken: String, userName: String, callback: () -> Unit) {
         executor.execute {
-            val pendingDatapoints = pendingDatapointDao.findAll(userName)
+            val pendingDatapoints = pendingDatapointDao.findPendingByUser(userName)
             Log.d(javaClass.simpleName, "Found pending datapoints: $pendingDatapoints")
             pendingDatapoints.forEach { datapoint ->
-                pendingDatapointDao.deleteOne(datapoint)
+                datapoint.pending = false
+                pendingDatapointDao.insertOne(datapoint)
                 val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
                 goalTiming?.let {
                     postDatapoint(
