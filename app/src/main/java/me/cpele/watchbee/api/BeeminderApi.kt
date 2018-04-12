@@ -31,6 +31,6 @@ interface BeeminderApi {
             @Path("user") userName: String,
             @Path("goal") slug: String,
             @Query("access_token") accessToken: String
-    )
+    ): Call<List<Datapoint>>
 }
 

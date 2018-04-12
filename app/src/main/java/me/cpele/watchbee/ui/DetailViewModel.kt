@@ -55,8 +55,14 @@ class DetailViewModel(
         )
     }
 
-    fun findDatapoints(): LiveData<List<DatapointBo>> {
-        return beeRepository.asyncFindDatapointsBySlug(userName, slug)
+    fun findDatapoints(context: Context): LiveData<List<DatapointBo>> {
+        return beeRepository.asyncFindDatapointsBySlug(
+                slug = slug,
+                userName = userName,
+                accessToken = PreferenceManager
+                        .getDefaultSharedPreferences(context)
+                        .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
+        )
     }
 
     class Factory(

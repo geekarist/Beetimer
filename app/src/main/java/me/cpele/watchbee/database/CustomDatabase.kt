@@ -3,8 +3,8 @@ package me.cpele.watchbee.database
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.TypeConverters
+import me.cpele.watchbee.database.dao.DatapointDao
 import me.cpele.watchbee.database.dao.GoalTimingDao
-import me.cpele.watchbee.database.dao.PendingDatapointDao
 import me.cpele.watchbee.database.dao.StatusChangeDao
 import me.cpele.watchbee.domain.DatapointBo
 import me.cpele.watchbee.domain.GoalTiming
@@ -15,5 +15,5 @@ import me.cpele.watchbee.domain.StatusChange
 abstract class CustomDatabase : RoomDatabase() {
     abstract fun goalTimingDao(): GoalTimingDao
     abstract fun statusDao(): StatusChangeDao
-    abstract fun pendingDatapointDao(): PendingDatapointDao
+    abstract fun pendingDatapointDao(): DatapointDao
 }

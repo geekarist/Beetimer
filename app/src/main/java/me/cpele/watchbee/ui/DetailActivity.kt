@@ -90,7 +90,8 @@ class DetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         handler.post(runnableForceRefresh)
-        viewModel.findDatapoints().observe(this, Observer {
+
+        viewModel.findDatapoints(this).observe(this, Observer {
             Log.d(localClassName, "I'm seeing ${it?.size} datapoints")
         })
     }

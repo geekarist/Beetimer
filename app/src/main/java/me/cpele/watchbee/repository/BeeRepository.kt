@@ -12,8 +12,8 @@ import me.cpele.watchbee.api.Datapoint
 import me.cpele.watchbee.api.Goal
 import me.cpele.watchbee.api.User
 import me.cpele.watchbee.database.CustomDatabase
+import me.cpele.watchbee.database.dao.DatapointDao
 import me.cpele.watchbee.database.dao.GoalTimingDao
-import me.cpele.watchbee.database.dao.PendingDatapointDao
 import me.cpele.watchbee.database.dao.StatusChangeDao
 import me.cpele.watchbee.domain.*
 import me.cpele.watchbee.ui.CustomApp
@@ -40,7 +40,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
-    private val pendingDatapointDao: PendingDatapointDao = database.pendingDatapointDao()
+    private val datapointDao: DatapointDao = database.pendingDatapointDao()
 
     val latestStatus: LiveData<StatusChange>
         get() {
@@ -198,23 +198,24 @@ class BeeRepository(context: Context, private val executor: Executor) {
     ) {
         executor.execute {
             val datapoint = DatapointBo(
+                    id = "",
                     userName = userName,
                     goalSlug = goalSlug,
                     datapointValue = datapointValue,
                     comment = comment,
                     pending = true
             )
-            pendingDatapointDao.insertOne(datapoint)
+            datapointDao.insertOne(datapoint)
         }
     }
 
     private fun postQueuedDatapoints(accessToken: String, userName: String, callback: () -> Unit) {
         executor.execute {
-            val pendingDatapoints = pendingDatapointDao.findPendingByUser(userName)
+            val pendingDatapoints = datapointDao.findPendingByUser(userName)
             Log.d(javaClass.simpleName, "Found pending datapoints: $pendingDatapoints")
             pendingDatapoints.forEach { datapoint ->
                 datapoint.pending = false
-                pendingDatapointDao.insertOne(datapoint)
+                datapointDao.insertOne(datapoint)
                 val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
                 goalTiming?.let {
                     postDatapoint(
@@ -276,8 +277,56 @@ class BeeRepository(context: Context, private val executor: Executor) {
         }
     }
 
-    fun asyncFindDatapointsBySlug(slug: String, userName: String): LiveData<List<DatapointBo>> {
-        return pendingDatapointDao.findBySlug(userName, slug);
+    fun asyncFindDatapointsBySlug(
+            slug: String,
+            userName: String,
+            accessToken: String
+    ): LiveData<List<DatapointBo>> {
+
+        insertStatusChange(StatusChange(status = Status.LOADING))
+
+        CustomApp.instance.api
+                .getDataPoints(userName, slug, accessToken)
+                .enqueue(object : Callback<List<Datapoint>> {
+                    override fun onFailure(call: Call<List<Datapoint>>?, t: Throwable?) {
+                        insertStatusChange(StatusChange(
+                                status = Status.FAILURE,
+                                message = "Error getting datapoints"
+                        ))
+                    }
+
+                    override fun onResponse(
+                            call: Call<List<Datapoint>>?,
+                            response: Response<List<Datapoint>>?
+                    ) {
+                        val body = response?.body()
+                        if (body != null) {
+                            insertDatapoints(body, userName, slug)
+                            insertStatusChange(StatusChange(status = Status.SUCCESS))
+                        } else {
+                            insertStatusChange(StatusChange(
+                                    status = Status.FAILURE,
+                                    message = "Response received but body is null"
+                            ))
+                        }
+                    }
+                })
+
+        return datapointDao.findBySlug(userName, slug);
+    }
+
+    private fun insertDatapoints(body: List<Datapoint>, userName: String, slug: String) {
+        executor.execute {
+            datapointDao.insert(body.map {
+                DatapointBo(
+                        id = it.id,
+                        userName = userName,
+                        goalSlug = slug,
+                        datapointValue = it.value.toFloat(),
+                        comment = it.comment,
+                        pending = false
+                )
+            })
+        }
     }
 }
-
