@@ -294,6 +294,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                                 status = Status.FAILURE,
                                 message = "Error getting datapoints"
                         ))
+                        Log.w(BeeRepository::class.java.simpleName, t)
                     }
 
                     override fun onResponse(
@@ -313,7 +314,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     }
                 })
 
-        return datapointDao.findBySlug(userName, slug);
+        return datapointDao.findBySlug(userName, slug)
     }
 
     private fun insertDatapoints(body: List<Datapoint>, userName: String, slug: String) {

@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.widget.TimePicker
 import kotlinx.android.synthetic.main.view_item.view.*
 import me.cpele.watchbee.databinding.ViewItemBinding
@@ -38,7 +37,6 @@ class GoalGeneralViewHolder(
     fun attach() {
         runnable?.let { handler.removeCallbacks(it) }
         runnable = Runnable {
-            Log.d(javaClass.simpleName, "Updating stopwatch")
             itemBinding.root.item_timer.text = stopwatch.format()
             itemBinding.root.item_timer.setTextColor(ContextCompat.getColor(context, stopwatch.color()))
             handler.postDelayed(runnable, 1000)
@@ -47,7 +45,7 @@ class GoalGeneralViewHolder(
     }
 
     override fun onClickItem(goalTiming: GoalTiming) {
-        listener.onOpen(goalTiming);
+        listener.onOpen(goalTiming)
     }
 
     override fun onClickTimer(goalTiming: GoalTiming) {

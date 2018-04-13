@@ -1,12 +1,15 @@
 package me.cpele.watchbee.ui
 
 import android.app.Application
+import com.google.gson.GsonBuilder
 import me.cpele.watchbee.BuildConfig
+import me.cpele.watchbee.api.EpochTypeAdapter
 import me.cpele.watchbee.repository.BeeRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 
 class CustomApp : Application() {
 
@@ -33,9 +36,11 @@ class CustomApp : Application() {
                         it.addInterceptor(loggingInterceptor)
                     } else it
                 }.build()
+        val gson = GsonBuilder().registerTypeAdapter(Date::class.java, EpochTypeAdapter()).create()
+        val converterFactory = GsonConverterFactory.create(gson)
         val retrofit = Retrofit.Builder()
                 .baseUrl("https://www.beeminder.com")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(converterFactory)
                 .client(okHttpClient)
                 .build()
         retrofit.create(me.cpele.watchbee.api.BeeminderApi::class.java)
