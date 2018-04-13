@@ -40,7 +40,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val goalTimingDao: GoalTimingDao = database.goalTimingDao()
     private val statusChangeDao: StatusChangeDao = database.statusDao()
-    private val datapointDao: DatapointDao = database.pendingDatapointDao()
+    private val datapointDao: DatapointDao = database.datapointDao()
 
     val latestStatus: LiveData<StatusChange>
         get() {
@@ -199,11 +199,12 @@ class BeeRepository(context: Context, private val executor: Executor) {
         executor.execute {
             val datapoint = DatapointBo(
                     id = "",
-                    userName = userName,
                     goalSlug = goalSlug,
+                    userName = userName,
                     datapointValue = datapointValue,
                     comment = comment,
-                    pending = true
+                    pending = true,
+                    updatedAt = Date()
             )
             datapointDao.insertOne(datapoint)
         }
@@ -320,11 +321,12 @@ class BeeRepository(context: Context, private val executor: Executor) {
             datapointDao.insert(body.map {
                 DatapointBo(
                         id = it.id,
-                        userName = userName,
                         goalSlug = slug,
+                        userName = userName,
                         datapointValue = it.value.toFloat(),
                         comment = it.comment,
-                        pending = false
+                        pending = false,
+                        updatedAt = it.updated_at
                 )
             })
         }

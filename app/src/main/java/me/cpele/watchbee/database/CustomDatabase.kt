@@ -15,5 +15,5 @@ import me.cpele.watchbee.domain.StatusChange
 abstract class CustomDatabase : RoomDatabase() {
     abstract fun goalTimingDao(): GoalTimingDao
     abstract fun statusDao(): StatusChangeDao
-    abstract fun pendingDatapointDao(): DatapointDao
+    abstract fun datapointDao(): DatapointDao
 }

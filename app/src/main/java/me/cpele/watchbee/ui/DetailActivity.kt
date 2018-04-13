@@ -7,9 +7,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearLayoutManager.VERTICAL
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_detail.*
 import me.cpele.watchbee.R
 import me.cpele.watchbee.databinding.ActivityDetailBinding
 import me.cpele.watchbee.domain.Status
@@ -42,6 +45,8 @@ class DetailActivity : AppCompatActivity() {
                     ?: throw IllegalStateException(
                             "User name should not be null. Did you use the start() method for instantiation?")
         }
+
+    private lateinit var adapter: DetailAdapter
 
     private val viewModel: DetailViewModel
         get() {
@@ -76,6 +81,10 @@ class DetailActivity : AppCompatActivity() {
         setContentView(view)
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
 
+        adapter = DetailAdapter()
+        detail_datapoints.adapter = adapter
+        detail_datapoints.layoutManager = LinearLayoutManager(this, VERTICAL, false)
+
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
             if (it?.status == Status.AUTH_ERROR) {
@@ -92,7 +101,7 @@ class DetailActivity : AppCompatActivity() {
         handler.post(runnableForceRefresh)
 
         viewModel.findDatapoints(this).observe(this, Observer {
-            Log.d(localClassName, "I'm seeing ${it?.size} datapoints")
+            it?.apply(adapter::submitList)
         })
     }
 

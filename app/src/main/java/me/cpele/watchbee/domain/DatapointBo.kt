@@ -2,6 +2,7 @@ package me.cpele.watchbee.domain
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import java.util.*
 
 @Entity(tableName = "Datapoint")
 data class DatapointBo(
@@ -11,5 +12,6 @@ data class DatapointBo(
         val userName: String,
         val datapointValue: Float,
         val comment: String,
-        var pending: Boolean
+        var pending: Boolean,
+        val updatedAt: Date
 )
