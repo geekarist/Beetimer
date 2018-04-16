@@ -52,62 +52,9 @@
             tools:listitem="@layout/view_detail_item"
             />
 
-        <TextView
-            android:id="@+id/detail_timer"
-            style="@style/TextAppearance.AppCompat.Display2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="@{model.goalTiming.stopwatch.format()}"
-            app:layout_constraintBottom_toTopOf="@+id/detail_button_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="00:24:02"
-            />
-
-        <ImageButton
-            android:id="@+id/detail_button_cancel"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:contentDescription="@string/detail_cancel"
-            android:onClick="@{() -> model.onCancel()}"
-            android:src="@drawable/ic_clear_black_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/detail_button_start_stop"
-            app:layout_constraintStart_toStartOf="parent"
-            />
-
-        <ImageButton
-            android:id="@+id/detail_button_start_stop"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:contentDescription="@string/detail_start"
-            android:onClick="@{() -> model.onToggle()}"
-            android:src="@{model.startStopDrawable(context)}"
-            app:layout_constraintBottom_toBottomOf="@+id/detail_button_cancel"
-            app:layout_constraintEnd_toStartOf="@+id/detail_button_submit"
-            app:layout_constraintStart_toEndOf="@+id/detail_button_cancel"
-            app:layout_constraintTop_toTopOf="@+id/detail_button_cancel"
-            tools:src="@drawable/ic_play_arrow_black_24dp"
-            />
-
-        <ImageButton
-            android:id="@+id/detail_button_submit"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:contentDescription="@string/detail_submit"
-            android:onClick="@{() -> model.onSubmit(context)}"
-            android:src="@drawable/ic_done_black_24dp"
-            app:layout_constraintBottom_toBottomOf="@+id/detail_button_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/detail_button_start_stop"
-            app:layout_constraintTop_toTopOf="@+id/detail_button_cancel"
+        <include
+            android:id="@+id/detail_view_timer"
+            layout="@layout/view_detail_timer"
             />
 
     </android.support.constraint.ConstraintLayout>

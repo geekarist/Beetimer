@@ -74,10 +74,13 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val view = layoutInflater.inflate(R.layout.activity_detail, null, false)
 
-        val binding = ActivityDetailBinding.bind(view)
-        binding.setLifecycleOwner(this)
-        binding.model = viewModel
-        binding.listener = this
+        val detailBinding = ActivityDetailBinding.bind(view)
+        detailBinding.setLifecycleOwner(this)
+        detailBinding.model = viewModel
+        detailBinding.listener = this
+
+        detailBinding.detailViewTimer?.model = viewModel
+        detailBinding.detailViewTimer?.listener = this
 
         setContentView(view)
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--suppress AndroidElementNotAllowed -->
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/activity_detail"
+    >
+
+    <data>
+
+        <variable
+            name="model"
+            type="me.cpele.watchbee.ui.DetailViewModel"
+            />
+
+        <variable
+            name="listener"
+            type="me.cpele.watchbee.ui.DetailActivity"
+            />
+    </data>
+
+    <merge>
+
+        <TextView
+            android:id="@+id/detail_timer"
+            style="@style/TextAppearance.AppCompat.Display2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@{model.goalTiming.stopwatch.format()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/detail_button_cancel"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="00:24:02"
+            />
+
+        <ImageButton
+            android:id="@+id/detail_button_cancel"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/detail_cancel"
+            android:onClick="@{() -> model.onCancel()}"
+            android:src="@drawable/ic_clear_black_24dp"
+            app:layout_constraintBottom_toBottomOf="@id/detail_timer"
+            app:layout_constraintEnd_toStartOf="@id/detail_button_start_stop"
+            app:layout_constraintStart_toEndOf="@id/detail_timer"
+            app:layout_constraintTop_toTopOf="@id/detail_timer"
+            />
+
+        <ImageButton
+            android:id="@+id/detail_button_start_stop"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/detail_start"
+            android:onClick="@{() -> model.onToggle()}"
+            android:src="@{model.startStopDrawable(context)}"
+            app:layout_constraintBottom_toBottomOf="@id/detail_timer"
+            app:layout_constraintEnd_toStartOf="@id/detail_button_submit"
+            app:layout_constraintStart_toEndOf="@id/detail_button_cancel"
+            app:layout_constraintTop_toTopOf="@id/detail_timer"
+            tools:src="@drawable/ic_play_arrow_black_24dp"
+            />
+
+        <ImageButton
+            android:id="@+id/detail_button_submit"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/detail_submit"
+            android:onClick="@{() -> model.onSubmit(context)}"
+            android:src="@drawable/ic_done_black_24dp"
+            app:layout_constraintBottom_toBottomOf="@id/detail_timer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/detail_button_start_stop"
+            app:layout_constraintTop_toTopOf="@id/detail_timer"
+            />
+
+    </merge>
+
+</layout>
