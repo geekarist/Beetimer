@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager.VERTICAL
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_detail.*
 import me.cpele.watchbee.R
@@ -115,6 +116,8 @@ class DetailActivity : AppCompatActivity() {
                 adapter.submitList(this)
             })
         })
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -128,6 +131,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         super.onPause()
         handler.removeCallbacks(runnableForceRefresh)
     }
