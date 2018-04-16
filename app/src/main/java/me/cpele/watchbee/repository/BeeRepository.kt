@@ -116,7 +116,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
         })
     }
 
-    private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit) {
+    private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit = {}) {
 
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
@@ -186,6 +186,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                                     message = "Datapoint submitted successfully"
                             ))
                         }
+                        asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
                     }
                 })
     }

@@ -9,6 +9,7 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearLayoutManager.VERTICAL
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
@@ -101,7 +102,15 @@ class DetailActivity : AppCompatActivity() {
         handler.post(runnableForceRefresh)
 
         viewModel.findDatapoints(this).observe(this, Observer {
-            it?.apply(adapter::submitList)
+            it?.apply({
+                adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        detail_datapoints.scrollToPosition(positionStart)
+                        adapter.unregisterAdapterDataObserver(this)
+                    }
+                })
+                adapter.submitList(this)
+            })
         })
     }
 
