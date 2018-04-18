@@ -27,13 +27,18 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     private val database: CustomDatabase = Room
             .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
-            .addMigrations(Companion.MIGRATION_1_TO_2)
+            .addMigrations(Companion.MIGRATION_1_TO_2, Companion.MIGRATION_2_TO_3)
             .build()
 
     companion object {
         private val MIGRATION_1_TO_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE StatusChange ADD COLUMN message TEXT")
+            }
+        }
+        private val MIGRATION_2_TO_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Nothing changed
             }
         }
     }
