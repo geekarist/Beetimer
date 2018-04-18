@@ -279,7 +279,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
             val goalTiming = goalTimingDao.findOneBySlug(slug)
             goalTiming?.apply {
                 submit(this, accessToken)
-                persist(this)
             }
         }
     }
