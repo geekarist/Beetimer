@@ -154,10 +154,17 @@ class BeeRepository(context: Context, private val executor: Executor) {
         goalTiming.stopwatch.clear()
         persist(goalTiming)
 
-        postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
+        postDatapoint(
+                userName = userName,
+                goalSlug = goalSlug,
+                datapointValue = datapointValue,
+                comment = comment,
+                accessToken = accessToken
+        )
     }
 
     private fun postDatapoint(
+            datapointId: String? = null,
             userName: String,
             goalSlug: String,
             datapointValue: Float,
@@ -181,6 +188,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                                     "Submission failed: datapoint stored locally until next sync"
                             ))
                         }
+                        datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
                         enqueueDatapoint(userName, goalSlug, datapointValue, comment)
                     }
 
@@ -191,9 +199,14 @@ class BeeRepository(context: Context, private val executor: Executor) {
                                     message = "Datapoint submitted successfully"
                             ))
                         }
+                        datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
                         asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
                     }
                 })
+    }
+
+    private fun asyncDeleteDatapointById(id: String) {
+        executor.execute { datapointDao.deleteById(id) }
     }
 
     private fun enqueueDatapoint(
@@ -204,7 +217,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
     ) {
         executor.execute {
             val datapoint = DatapointBo(
-                    id = "",
+                    id = UUID.randomUUID().toString(),
                     goalSlug = goalSlug,
                     userName = userName,
                     datapointValue = datapointValue,
@@ -226,6 +239,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
                 goalTiming?.let {
                     postDatapoint(
+                            datapoint.id,
                             userName,
                             datapoint.goalSlug,
                             datapoint.datapointValue,

@@ -21,4 +21,7 @@ interface DatapointDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(datapoints: List<DatapointBo>)
+
+    @Query("DELETE FROM Datapoint WHERE id = :id")
+    fun deleteById(id: String)
 }
