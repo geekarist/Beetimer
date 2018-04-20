@@ -107,13 +107,21 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel.findDatapoints(this).observe(this, Observer {
             it?.apply({
-                adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+                adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                         detail_datapoints.scrollToPosition(positionStart)
                         adapter.unregisterAdapterDataObserver(this)
                     }
                 })
-                adapter.submitList(this)
+                adapter.submitList(
+                        this.sortedWith(kotlin.Comparator { p1, p2 ->
+                            if (p1.pending == p2.pending) {
+                                (p2.updatedAt.time - p1.updatedAt.time).toInt()
+                            } else {
+                                if (p1.pending) -1 else 1
+                            }
+                        })
+                )
             })
         })
 
