@@ -15,7 +15,9 @@
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawablePadding="8dp"
         app:layout_constraintTop_toTopOf="parent"
+        tools:drawableEnd="@drawable/ic_sync_disabled_black_24dp"
         tools:text="01/01/1970 19:28"
         />
 

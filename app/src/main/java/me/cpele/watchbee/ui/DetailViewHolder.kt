@@ -18,7 +18,7 @@ class DetailViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         }
 
         val drawableSync = if (item?.pending == true) R.drawable.ic_sync_disabled_black_24dp else 0
-        itemView.detail_item_title.setCompoundDrawablesWithIntrinsicBounds(drawableSync, 0, 0, 0)
+        itemView.detail_item_title.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableSync, 0)
 
         itemView.detail_item_desc.text = item?.comment
         itemView.detail_item_value.text = String.format("%.02f", item?.datapointValue)
