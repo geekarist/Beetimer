@@ -115,7 +115,7 @@ class DetailActivity : AppCompatActivity() {
                 })
                 adapter.submitList(
                         this.sortedWith(kotlin.Comparator { p1, p2 ->
-                            val pendingComparison = p1.pending.compareTo(p2.pending)
+                            val pendingComparison = p2.pending.compareTo(p1.pending)
                             if (pendingComparison != 0) {
                                 pendingComparison
                             } else {
