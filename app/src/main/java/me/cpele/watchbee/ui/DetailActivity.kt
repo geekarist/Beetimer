@@ -115,10 +115,11 @@ class DetailActivity : AppCompatActivity() {
                 })
                 adapter.submitList(
                         this.sortedWith(kotlin.Comparator { p1, p2 ->
-                            if (p1.pending == p2.pending) {
-                                (p2.updatedAt.time - p1.updatedAt.time).toInt()
+                            val pendingComparison = p1.pending.compareTo(p2.pending)
+                            if (pendingComparison != 0) {
+                                pendingComparison
                             } else {
-                                if (p1.pending) -1 else 1
+                                p2.updatedAt.compareTo(p1.updatedAt)
                             }
                         })
                 )
