@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import me.cpele.fleabrainer.R
 
-private const val BMNDR_CLIENT_ID = "31ictv1j0ieiwnmcjxrs3ncsr"
+private const val BMNDR_CLIENT_ID = "8kss1m8xeuh006m49nrt7hcll"
 private const val BMNDR_REDIRECT_URI = "fleabrainer://auth_callback"
 
 class SignInActivity : AppCompatActivity() {
