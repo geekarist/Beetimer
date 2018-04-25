@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "me.cpele.watchbee"
+        applicationId "me.cpele.fleabrainer"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1

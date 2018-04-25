@@ -6,12 +6,12 @@
 
         <variable
             name="model"
-            type="me.cpele.watchbee.domain.GoalTiming"
+            type="me.cpele.fleabrainer.domain.GoalTiming"
             />
 
         <variable
             name="listener"
-            type="me.cpele.watchbee.ui.GoalViewListener"
+            type="me.cpele.fleabrainer.ui.GoalViewListener"
             />
     </data>
 

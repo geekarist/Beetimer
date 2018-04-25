@@ -10,12 +10,12 @@
 
         <variable
             name="model"
-            type="me.cpele.watchbee.ui.DetailViewModel"
+            type="me.cpele.fleabrainer.ui.DetailViewModel"
             />
 
         <variable
             name="listener"
-            type="me.cpele.watchbee.ui.DetailActivity"
+            type="me.cpele.fleabrainer.ui.DetailActivity"
             />
     </data>
 

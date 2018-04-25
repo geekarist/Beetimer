@@ -24,7 +24,7 @@ class AppTest {
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-        device.wait(Until.findObject(By.res("me.cpele.watchbee:id/item_title")), START_TIMEOUT)
+        device.wait(Until.findObject(By.res("me.cpele.fleabrainer:id/item_title")), START_TIMEOUT)
                 .click()
     }
 }
