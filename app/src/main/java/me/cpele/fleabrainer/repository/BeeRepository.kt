@@ -201,6 +201,10 @@ class BeeRepository(context: Context, private val executor: Executor) {
                         }
                         datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
                         asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
+                        executor.execute {
+                            Thread.sleep(5000)
+                            fetchGoals(accessToken, userName)
+                        }
                     }
                 })
     }
