@@ -1,7 +1,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="me.cpele.watchbee"
+    package="me.cpele.fleabrainer"
     >
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -39,7 +39,7 @@
 
                 <data
                     android:host="auth_callback"
-                    android:scheme="watchbee"
+                    android:scheme="fleabrainer"
                     />
             </intent-filter>
 
@@ -60,7 +60,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="me.cpele.watchbee.ACTION_START_BEE_JOB"/>
+                <action android:name="me.cpele.fleabrainer.ACTION_START_BEE_JOB"/>
             </intent-filter>
         </receiver>
 
