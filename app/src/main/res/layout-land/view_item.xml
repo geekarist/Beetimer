@@ -25,6 +25,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
+        android:onClick="@{() -> listener.onClickItem(model)}"
         >
 
         <android.support.constraint.ConstraintLayout
@@ -42,7 +43,8 @@
                 android:paddingBottom="10dp"
                 android:text="@{model.goal.title}"
                 android:textAlignment="center"
-                tools:text="Learn to be a more efficient developer"/>
+                tools:text="Learn to be a more efficient developer"
+                />
 
             <android.support.constraint.Guideline
                 android:id="@+id/item_guideline_left"
