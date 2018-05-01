@@ -43,7 +43,8 @@
                 android:paddingBottom="15dp"
                 android:text="@{model.goal.title}"
                 android:textAlignment="center"
-                tools:text="Learn to be a more efficient developer"/>
+                tools:text="Learn to be a more efficient developer"
+                />
 
             <android.support.constraint.Guideline
                 android:id="@+id/item_guideline_left"
@@ -119,12 +120,12 @@
                 android:id="@+id/item_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{@string/item_rate(model.goal.rate, model.goal.runits)}"
+                android:text="@{@string/item_rate(model.goal.formattedRate, model.goal.runits)}"
                 app:layout_constraintBottom_toTopOf="@id/item_bare_min"
                 app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
                 app:layout_constraintRight_toRightOf="@id/item_id"
                 app:layout_constraintTop_toBottomOf="@id/item_id"
-                tools:text="Rate: 0.86/dy"
+                tools:text="Rate: 42 min/dy"
                 />
 
             <TextView

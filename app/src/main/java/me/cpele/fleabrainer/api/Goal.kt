@@ -13,7 +13,8 @@ data class Goal(
         val lane: Int,
         val yaw: Int,
         val runits: String,
-        val limsum: String) {
+        val limsum: String
+) {
 
     val color: Int
         @ColorRes
@@ -54,5 +55,15 @@ data class Goal(
                     TimeUnit.DAYS.toSeconds(derailDays) -
                     TimeUnit.HOURS.toSeconds(derailHours) -
                     TimeUnit.MINUTES.toSeconds(derailMin)
+        }
+
+    val formattedRate: String
+        get() {
+            val floatMsRate = rate.toFloat() * 60 * 60 * 1000
+            val longMsRate = floatMsRate.toLong()
+            val hrRate = TimeUnit.MILLISECONDS.toHours(longMsRate)
+            val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
+            val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
+            return "%dh%02d".format(hrRate, minRate)
         }
 }
