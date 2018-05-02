@@ -57,13 +57,23 @@ data class Goal(
                     TimeUnit.MINUTES.toSeconds(derailMin)
         }
 
-    val formattedRate: String get() = formatHoursAsDuration(rate.toFloat())
-    val formattedLimsum: String get() {
-        val split = limsum.split(' ')
-        val first = split.first()
-        val rest = split.filterIndexed { index, s -> index > 0 }.joinToString(" ")
-        return "${formatHoursAsDuration(first.toFloat())} ${rest}"
-    }
+    val formattedRate: String?
+        get() {
+            return rate.toFloatOrNull()?.let {
+                formatHoursAsDuration(it)
+            }
+        }
+
+    val formattedLimsum: String?
+        get() {
+            val split = limsum.split(' ')
+            return split.firstOrNull()?.let {
+                val rest = split
+                        .filterIndexed { index, s -> index > 0 }
+                        .joinToString(" ")
+                return "${formatHoursAsDuration(it.toFloat())} $rest"
+            }
+        }
 }
 
 /**
@@ -84,8 +94,8 @@ private fun formatHoursAsDuration(floatHours: Float): String {
     val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
     val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
 
-    var result = ""
+    var result = if (floatHours >= 0) "+" else "-"
     if (hrRate > 0) result += "${hrRate}h"
-    if (minRate > 0) result += "%02dm".format(minRate)
+    if (minRate > 0) result += "${minRate}m"
     return result
 }
