@@ -134,7 +134,7 @@
                 android:id="@+id/item_bare_min"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{model.goal.limsum}"
+                android:text="@{model.goal.formattedLimsum}"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="@id/item_id"
