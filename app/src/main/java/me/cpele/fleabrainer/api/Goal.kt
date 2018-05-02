@@ -64,6 +64,10 @@ data class Goal(
             val hrRate = TimeUnit.MILLISECONDS.toHours(longMsRate)
             val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
             val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
-            return "%dh%02d".format(hrRate, minRate)
+
+            var result = ""
+            if (hrRate > 0) result += "${hrRate}h"
+            if (minRate > 0) result += "%02dm".format(minRate)
+            return result
         }
 }
