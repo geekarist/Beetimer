@@ -125,7 +125,7 @@
                 app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
                 app:layout_constraintRight_toRightOf="@id/item_id"
                 app:layout_constraintTop_toBottomOf="@id/item_id"
-                tools:text="Rate: 42 min/dy"
+                tools:text="Rate: 42m/dy"
                 />
 
             <TextView

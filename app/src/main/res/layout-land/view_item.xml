@@ -122,12 +122,12 @@
                 android:id="@+id/item_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{@string/item_rate(model.goal.rate, model.goal.runits)}"
+                android:text="@{@string/item_rate(model.goal.formattedRate, model.goal.runits)}"
                 app:layout_constraintBottom_toTopOf="@id/item_bare_min"
                 app:layout_constraintLeft_toLeftOf="@id/item_id"
                 app:layout_constraintRight_toRightOf="@id/item_id"
                 app:layout_constraintTop_toBottomOf="@id/item_id"
-                tools:text="Rate: 0.86/dy"
+                tools:text="Rate: 42m/dy"
                 />
 
             <TextView
