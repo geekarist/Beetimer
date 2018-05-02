@@ -57,17 +57,35 @@ data class Goal(
                     TimeUnit.MINUTES.toSeconds(derailMin)
         }
 
-    val formattedRate: String
-        get() {
-            val floatMsRate = rate.toFloat() * 60 * 60 * 1000
-            val longMsRate = floatMsRate.toLong()
-            val hrRate = TimeUnit.MILLISECONDS.toHours(longMsRate)
-            val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
-            val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
+    val formattedRate: String get() = formatHoursAsDuration(rate.toFloat())
+    val formattedLimsum: String get() {
+        val split = limsum.split(' ')
+        val first = split.first()
+        val rest = split.filterIndexed { index, s -> index > 0 }.joinToString(" ")
+        return "${formatHoursAsDuration(first.toFloat())} ${rest}"
+    }
+}
 
-            var result = ""
-            if (hrRate > 0) result += "${hrRate}h"
-            if (minRate > 0) result += "%02dm".format(minRate)
-            return result
-        }
+/**
+ * Convert hours to a duration.
+ *
+ * Example:
+ *
+ * ```
+ * val duration = formatHoursAsDuration(.75)
+ * ```
+ *
+ * In that case, `duration` is "45m" (45 minutes).
+ */
+private fun formatHoursAsDuration(floatHours: Float): String {
+    val floatMsRate = floatHours * 60 * 60 * 1000
+    val longMsRate = floatMsRate.toLong()
+    val hrRate = TimeUnit.MILLISECONDS.toHours(longMsRate)
+    val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
+    val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
+
+    var result = ""
+    if (hrRate > 0) result += "${hrRate}h"
+    if (minRate > 0) result += "%02dm".format(minRate)
+    return result
 }
