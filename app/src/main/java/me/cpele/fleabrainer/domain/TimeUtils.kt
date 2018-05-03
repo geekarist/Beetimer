@@ -14,15 +14,18 @@ import java.util.concurrent.TimeUnit
  * In that case, `duration` is "45m" (45 minutes).
  */
 fun formatHoursAsDuration(floatHours: Float, displaySign: Boolean = true): String {
-    val floatMsRate = floatHours * 60 * 60 * 1000
-    val longMsRate = floatMsRate.toLong()
-    val hrRate = TimeUnit.MILLISECONDS.toHours(longMsRate)
-    val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
-    val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
+    val floatMsDuration = floatHours * 60 * 60 * 1000
+    val longMsDuration = floatMsDuration.toLong()
+    val hrDuration = TimeUnit.MILLISECONDS.toHours(longMsDuration)
+    val msHrDuration = TimeUnit.HOURS.toMillis(hrDuration)
+    val minDuration = TimeUnit.MILLISECONDS.toMinutes(longMsDuration - msHrDuration)
+    val msMinDuration = TimeUnit.MINUTES.toMillis(minDuration)
+    val secDuration = TimeUnit.MILLISECONDS.toSeconds(longMsDuration - msHrDuration - msMinDuration)
 
     var result = ""
     if (displaySign) result += if (floatHours >= 0) "+" else "-"
-    if (hrRate > 0) result += "${hrRate}h"
-    if (minRate > 0) result += "${minRate}m"
+    if (hrDuration > 0) result += "${hrDuration}h"
+    if (hrDuration > 0 || minDuration > 0) result += "${minDuration}m"
+    result += "${secDuration}s"
     return result
 }
