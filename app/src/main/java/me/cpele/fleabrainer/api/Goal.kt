@@ -2,6 +2,7 @@ package me.cpele.fleabrainer.api
 
 import android.support.annotation.ColorRes
 import me.cpele.fleabrainer.R
+import me.cpele.fleabrainer.domain.formatHoursAsDuration
 import java.util.concurrent.TimeUnit
 
 data class Goal(
@@ -60,7 +61,7 @@ data class Goal(
     val formattedRate: String?
         get() {
             return rate.toFloatOrNull()?.let {
-                formatHoursAsDuration(it)
+                formatHoursAsDuration(it, displaySign = false)
             }
         }
 
@@ -74,28 +75,4 @@ data class Goal(
                 return "${formatHoursAsDuration(it.toFloat())} $rest"
             }
         }
-}
-
-/**
- * Convert hours to a duration.
- *
- * Example:
- *
- * ```
- * val duration = formatHoursAsDuration(.75)
- * ```
- *
- * In that case, `duration` is "45m" (45 minutes).
- */
-private fun formatHoursAsDuration(floatHours: Float): String {
-    val floatMsRate = floatHours * 60 * 60 * 1000
-    val longMsRate = floatMsRate.toLong()
-    val hrRate = TimeUnit.MILLISECONDS.toHours(longMsRate)
-    val msHrRate = TimeUnit.HOURS.toMillis(hrRate)
-    val minRate = TimeUnit.MILLISECONDS.toMinutes(longMsRate - msHrRate)
-
-    var result = if (floatHours >= 0) "+" else "-"
-    if (hrRate > 0) result += "${hrRate}h"
-    if (minRate > 0) result += "${minRate}m"
-    return result
 }

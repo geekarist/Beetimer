@@ -6,6 +6,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.view_detail_item.view.*
 import me.cpele.fleabrainer.R
 import me.cpele.fleabrainer.domain.DatapointBo
+import me.cpele.fleabrainer.domain.formatHoursAsDuration
 
 private const val LEFT: Int = 0
 
@@ -21,6 +22,8 @@ class DetailViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         itemView.detail_item_title.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableSync, 0)
 
         itemView.detail_item_desc.text = item?.comment
-        itemView.detail_item_value.text = String.format("%.02f", item?.datapointValue)
+
+        val formattedValue = item?.datapointValue?.let { formatHoursAsDuration(it, displaySign = false) }
+        itemView.detail_item_value.text = formattedValue
     }
 }
