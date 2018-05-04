@@ -12,7 +12,7 @@ import kotlin.math.absoluteValue
  * val duration = formatHoursAsDuration(.75)
  * ```
  *
- * In that case, `duration` is "45m" (45 minutes).
+ * Here, `duration` will be "00:45:00" (45 minutes).
  */
 fun formatHoursAsDuration(floatHours: Float, displaySign: Boolean = true): String {
     val floatMsDuration = floatHours * 60 * 60 * 1000
