@@ -1,6 +1,7 @@
 package me.cpele.fleabrainer.domain
 
 import java.util.concurrent.TimeUnit
+import kotlin.math.absoluteValue
 
 /**
  * Convert hours to a duration.
@@ -23,9 +24,18 @@ fun formatHoursAsDuration(floatHours: Float, displaySign: Boolean = true): Strin
     val secDuration = TimeUnit.MILLISECONDS.toSeconds(longMsDuration - msHrDuration - msMinDuration)
 
     var result = ""
-    if (displaySign) result += if (floatHours >= 0) "+" else "-"
-    if (hrDuration > 0) result += "${hrDuration}h"
-    if (hrDuration > 0 || minDuration > 0) result += "${minDuration}m"
-    result += "${secDuration}s"
+
+    if (floatHours < 0) {
+        result += "-"
+    } else if (displaySign) {
+        result += "+"
+    }
+
+    result += "%02d:%02d:%02d".format(
+            hrDuration.absoluteValue,
+            minDuration.absoluteValue,
+            secDuration.absoluteValue
+    )
+
     return result
 }
