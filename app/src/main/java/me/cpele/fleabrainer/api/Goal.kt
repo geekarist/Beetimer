@@ -2,6 +2,7 @@ package me.cpele.fleabrainer.api
 
 import android.support.annotation.ColorRes
 import me.cpele.fleabrainer.R
+import me.cpele.fleabrainer.domain.formatHoursAsDuration
 import java.util.concurrent.TimeUnit
 
 data class Goal(
@@ -13,7 +14,8 @@ data class Goal(
         val lane: Int,
         val yaw: Int,
         val runits: String,
-        val limsum: String) {
+        val limsum: String
+) {
 
     val color: Int
         @ColorRes
@@ -54,5 +56,23 @@ data class Goal(
                     TimeUnit.DAYS.toSeconds(derailDays) -
                     TimeUnit.HOURS.toSeconds(derailHours) -
                     TimeUnit.MINUTES.toSeconds(derailMin)
+        }
+
+    val formattedRate: String?
+        get() {
+            return rate.toFloatOrNull()?.let {
+                formatHoursAsDuration(it, displaySign = false)
+            }
+        }
+
+    val formattedLimsum: String?
+        get() {
+            val split = limsum.split(' ')
+            return split.firstOrNull()?.let {
+                val rest = split
+                        .filterIndexed { index, s -> index > 0 }
+                        .joinToString(" ")
+                return "${formatHoursAsDuration(it.toFloat())} $rest"
+            }
         }
 }
