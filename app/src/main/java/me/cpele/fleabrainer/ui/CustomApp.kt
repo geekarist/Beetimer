@@ -5,11 +5,13 @@ import com.google.gson.GsonBuilder
 import me.cpele.fleabrainer.BuildConfig
 import me.cpele.fleabrainer.api.EpochTypeAdapter
 import me.cpele.fleabrainer.repository.BeeRepository
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import java.util.concurrent.Executors
 
 class CustomApp : Application() {
 
@@ -29,6 +31,7 @@ class CustomApp : Application() {
 
     val api: me.cpele.fleabrainer.api.BeeminderApi by lazy {
         val okHttpClient = OkHttpClient.Builder()
+                .dispatcher(Dispatcher(Executors.newSingleThreadExecutor()))
                 .let {
                     if (BuildConfig.DEBUG) {
                         val loggingInterceptor = HttpLoggingInterceptor()
