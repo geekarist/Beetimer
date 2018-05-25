@@ -8,9 +8,10 @@ import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import me.cpele.fleabrainer.api.Datapoint
 import me.cpele.fleabrainer.api.Goal
-import me.cpele.fleabrainer.api.User
 import me.cpele.fleabrainer.database.CustomDatabase
 import me.cpele.fleabrainer.database.dao.DatapointDao
 import me.cpele.fleabrainer.database.dao.GoalTimingDao
@@ -20,6 +21,7 @@ import me.cpele.fleabrainer.ui.CustomApp
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executor
 
@@ -95,17 +97,11 @@ class BeeRepository(context: Context, private val executor: Executor) {
     }
 
     private fun fetchUser(accessToken: String, callback: () -> Unit) {
-
         insertStatusChange(StatusChange(status = Status.LOADING))
 
-        CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
-            override fun onFailure(call: Call<User>?, t: Throwable?) {
-                insertStatusChange(
-                        StatusChange(status = Status.failure("Error loading user", t)),
-                        callback)
-            }
-
-            override fun onResponse(call: Call<User>?, response: Response<User>?) {
+        launch(UI) {
+            try {
+                val response = CustomApp.instance.api.getUser(accessToken).await()
                 if (response?.isSuccessful == true) {
                     response.body()?.apply {
                         postQueuedDatapoints(accessToken, username) {
@@ -117,27 +113,30 @@ class BeeRepository(context: Context, private val executor: Executor) {
                     val errorStatus = Status.authError(errorMsg)
                     insertStatusChange(StatusChange(status = errorStatus), callback)
                 }
+            } catch (e: IOException) {
+                insertStatusChange(
+                        StatusChange(status = Status.failure("Error loading user", e)),
+                        callback)
             }
-        })
+        }
     }
 
     private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit = {}) {
-
-        CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
-            override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
-                insertStatusChange(
-                        StatusChange(status = Status.failure("Error loading goals", t)),
-                        callback)
-            }
-
-            override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
+        launch(UI) {
+            try {
+                val response = CustomApp.instance.api.getGoals(user, accessToken).await()
                 response?.body()?.apply {
                     insertOrUpdateGoalTimings(user, this) {
                         insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
                     }
                 }
+            } catch (e: IOException) {
+                insertStatusChange(
+                        StatusChange(status = Status.failure("Error loading goals", e)),
+                        callback
+                )
             }
-        })
+        }
     }
 
     fun persist(goalTiming: GoalTiming) {

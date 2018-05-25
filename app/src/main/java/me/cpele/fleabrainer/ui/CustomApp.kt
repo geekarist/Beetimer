@@ -2,6 +2,7 @@ package me.cpele.fleabrainer.ui
 
 import android.app.Application
 import com.google.gson.GsonBuilder
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import me.cpele.fleabrainer.BuildConfig
 import me.cpele.fleabrainer.api.EpochTypeAdapter
 import me.cpele.fleabrainer.repository.BeeRepository
@@ -44,6 +45,7 @@ class CustomApp : Application() {
         val retrofit = Retrofit.Builder()
                 .baseUrl("https://www.beeminder.com")
                 .addConverterFactory(converterFactory)
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .client(okHttpClient)
                 .build()
         retrofit.create(me.cpele.fleabrainer.api.BeeminderApi::class.java)
