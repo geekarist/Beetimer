@@ -8,10 +8,8 @@ import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
 import me.cpele.fleabrainer.api.Datapoint
 import me.cpele.fleabrainer.api.Goal
 import me.cpele.fleabrainer.database.CustomDatabase
@@ -339,19 +337,21 @@ class BeeRepository(context: Context, private val executor: Executor) {
         return datapointDao.findBySlug(userName, slug)
     }
 
-    private fun insertDatapoints(body: List<Datapoint>, userName: String, slug: String) {
-        executor.execute {
-            datapointDao.insert(body.map {
-                DatapointBo(
-                        id = it.id,
-                        goalSlug = slug,
-                        userName = userName,
-                        datapointValue = it.value.toFloat(),
-                        comment = it.comment,
-                        pending = false,
-                        updatedAt = it.updated_at
-                )
-            })
-        }
+    private fun insertDatapoints(
+            datapoints: List<Datapoint>,
+            userName: String,
+            slug: String
+    ): Deferred<Unit> = async {
+        datapointDao.insert(datapoints.map {
+            DatapointBo(
+                    id = it.id,
+                    goalSlug = slug,
+                    userName = userName,
+                    datapointValue = it.value.toFloat(),
+                    comment = it.comment,
+                    pending = false,
+                    updatedAt = it.updated_at
+            )
+        })
     }
 }
