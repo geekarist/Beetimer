@@ -64,19 +64,22 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
 
-    private fun insertOrUpdateGoalTimings(user: String, list: List<Goal>, callback: () -> Unit = {}) =
-            executor.execute {
-                list.map { goal ->
-                    val goalTiming =
-                            goalTimingDao.findOneBySlug(goal.slug)
-                                    ?: GoalTiming(user = user, goal = goal, stopwatch = Stopwatch())
-                    goalTiming.goal = goal
-                    goalTiming
-                }.let { goalTimings ->
-                    goalTimingDao.insert(goalTimings)
-                }
-                callback()
-            }
+    private fun insertOrUpdateGoalTimings(
+            user: String,
+            list: List<Goal>,
+            callback: () -> Unit = {}
+    ) = async {
+        list.map { goal ->
+            val goalTiming =
+                    goalTimingDao.findOneBySlug(goal.slug)
+                            ?: GoalTiming(user = user, goal = goal, stopwatch = Stopwatch())
+            goalTiming.goal = goal
+            goalTiming
+        }.let { goalTimings ->
+            goalTimingDao.insert(goalTimings)
+        }
+        callback()
+    }
 
     private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) {
         executor.execute {
