@@ -1,7 +1,6 @@
 package me.cpele.fleabrainer.api
 
 import kotlinx.coroutines.experimental.Deferred
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -33,6 +32,6 @@ interface BeeminderApi {
             @Path("user") userName: String,
             @Path("goal") slug: String,
             @Query("access_token") accessToken: String
-    ): Call<List<Datapoint>>
+    ): Deferred<Response<List<Datapoint>>?>
 }
 

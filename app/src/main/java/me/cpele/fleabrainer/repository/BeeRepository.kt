@@ -20,9 +20,6 @@ import me.cpele.fleabrainer.database.dao.GoalTimingDao
 import me.cpele.fleabrainer.database.dao.StatusChangeDao
 import me.cpele.fleabrainer.domain.*
 import me.cpele.fleabrainer.ui.CustomApp
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executor
@@ -314,33 +311,30 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
         insertStatusChange(StatusChange(status = Status.LOADING))
 
-        CustomApp.instance.api
-                .getDataPoints(userName, slug, accessToken)
-                .enqueue(object : Callback<List<Datapoint>> {
-                    override fun onFailure(call: Call<List<Datapoint>>?, t: Throwable?) {
-                        insertStatusChange(StatusChange(
-                                status = Status.FAILURE,
-                                message = "Error getting datapoints"
-                        ))
-                        Log.w(BeeRepository::class.java.simpleName, t)
-                    }
+        launch(UI) {
 
-                    override fun onResponse(
-                            call: Call<List<Datapoint>>?,
-                            response: Response<List<Datapoint>>?
-                    ) {
-                        val body = response?.body()
-                        if (body != null) {
-                            insertDatapoints(body, userName, slug)
-                            insertStatusChange(StatusChange(status = Status.SUCCESS))
-                        } else {
-                            insertStatusChange(StatusChange(
-                                    status = Status.FAILURE,
-                                    message = "Response received but body is null"
-                            ))
-                        }
-                    }
-                })
+            try {
+                val response = CustomApp.instance.api.getDataPoints(userName, slug, accessToken).await()
+
+                val body = response?.body()
+                if (body != null) {
+                    insertDatapoints(body, userName, slug)
+                    insertStatusChange(StatusChange(status = Status.SUCCESS))
+                } else {
+                    insertStatusChange(StatusChange(
+                            status = Status.FAILURE,
+                            message = "Response received but body is null"
+                    ))
+                }
+
+            } catch (e: IOException) {
+                insertStatusChange(StatusChange(
+                        status = Status.FAILURE,
+                        message = "Error getting datapoints"
+                ))
+                Log.w(BeeRepository::class.java.simpleName, e)
+            }
+        }
 
         return datapointDao.findBySlug(userName, slug)
     }
