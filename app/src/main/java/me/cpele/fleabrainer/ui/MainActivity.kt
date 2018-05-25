@@ -62,7 +62,6 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
 
         if (savedInstanceState == null) {
             viewModel.refresh()
-            sendBroadcast(BeeJobReceiver.CustomIntent(extraAuthToken))
         }
 
         mAdapter = GoalAdapter(this)

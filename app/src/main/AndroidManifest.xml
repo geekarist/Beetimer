@@ -50,20 +50,6 @@
             android:parentActivityName=".ui.MainActivity"
             />
 
-        <service
-            android:name=".ui.BeeJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            />
-
-        <receiver android:name=".ui.BeeJobReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="me.cpele.fleabrainer.ACTION_START_BEE_JOB"/>
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>
