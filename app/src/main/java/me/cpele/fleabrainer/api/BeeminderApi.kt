@@ -26,7 +26,7 @@ interface BeeminderApi {
             @Query("value") datapointValue: Float,
             @Query("comment") comment: String,
             @Query("access_token") accessToken: String
-    ): Call<Datapoint>
+    ): Deferred<Datapoint?>
 
     @GET("/api/v1/users/{user}/goals/{goal}/datapoints.json")
     fun getDataPoints(

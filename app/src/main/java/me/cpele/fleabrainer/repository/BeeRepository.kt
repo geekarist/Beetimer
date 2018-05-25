@@ -8,7 +8,9 @@ import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import me.cpele.fleabrainer.api.Datapoint
 import me.cpele.fleabrainer.api.Goal
@@ -173,39 +175,43 @@ class BeeRepository(context: Context, private val executor: Executor) {
     ) {
         if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.LOADING))
 
-        CustomApp.instance.api
-                .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
-                .enqueue(object : Callback<Datapoint> {
+        launch(UI) {
+            try {
+                CustomApp.instance.api.postDatapoint(
+                        userName,
+                        goalSlug,
+                        datapointValue,
+                        comment,
+                        accessToken
+                ).await()
 
-                    override fun onFailure(call: Call<Datapoint>?, t: Throwable?) {
-                        val tag = BeeRepository::class.java.simpleName
-                        Log.e(tag, "Error posting goal timing: ", t)
-                        if (indicateStatusChange) {
-                            insertStatusChange(StatusChange(
-                                    status = Status.FAILURE,
-                                    message =
-                                    "Submission failed: datapoint stored locally until next sync"
-                            ))
-                        }
-                        datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
-                        enqueueDatapoint(userName, goalSlug, datapointValue, comment)
-                    }
+                if (indicateStatusChange) {
+                    insertStatusChange(StatusChange(
+                            status = Status.SUCCESS,
+                            message = "Datapoint submitted successfully"
+                    ))
+                }
 
-                    override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
-                        if (indicateStatusChange) {
-                            insertStatusChange(StatusChange(
-                                    status = Status.SUCCESS,
-                                    message = "Datapoint submitted successfully"
-                            ))
-                        }
-                        datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
-                        asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
-                        executor.execute {
-                            Thread.sleep(5000)
-                            fetchGoals(accessToken, userName)
-                        }
-                    }
-                })
+                datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
+                asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
+                launch(CommonPool) {
+                    delay(5000)
+                    fetchGoals(accessToken, userName)
+                }
+
+            } catch (e: IOException) {
+                val tag = BeeRepository::class.java.simpleName
+                Log.e(tag, "Error posting goal timing", e)
+                if (indicateStatusChange) {
+                    insertStatusChange(StatusChange(
+                            status = Status.FAILURE,
+                            message = "Submission failed: datapoint stored locally until next sync"
+                    ))
+                }
+                datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
+                enqueueDatapoint(userName, goalSlug, datapointValue, comment)
+            }
+        }
     }
 
     private fun asyncDeleteDatapointById(id: String) {
