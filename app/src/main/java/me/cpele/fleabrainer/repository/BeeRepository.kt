@@ -82,13 +82,13 @@ class BeeRepository(context: Context, private val executor: Executor) {
     }
 
     private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) {
-        executor.execute {
+        async {
             statusChangeDao.insert(status)
             callback()
         }
     }
 
-    private fun updateGoalTiming(goalTiming: GoalTiming) = executor.execute {
+    private fun updateGoalTiming(goalTiming: GoalTiming) = async {
         goalTimingDao.insertOne(goalTiming)
     }
 
