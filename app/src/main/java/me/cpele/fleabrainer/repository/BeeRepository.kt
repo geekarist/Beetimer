@@ -68,7 +68,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
             user: String,
             list: List<Goal>,
             callback: () -> Unit = {}
-    ) = async {
+    ) = launch {
         list.map { goal ->
             val goalTiming =
                     goalTimingDao.findOneBySlug(goal.slug)
@@ -82,13 +82,13 @@ class BeeRepository(context: Context, private val executor: Executor) {
     }
 
     private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) {
-        async {
+        launch {
             statusChangeDao.insert(status)
             callback()
         }
     }
 
-    private fun updateGoalTiming(goalTiming: GoalTiming) = async {
+    private fun updateGoalTiming(goalTiming: GoalTiming) = launch {
         goalTimingDao.insertOne(goalTiming)
     }
 
