@@ -23,7 +23,6 @@ import me.cpele.fleabrainer.ui.CustomApp
 import java.io.IOException
 import java.util.*
 
-// TODO: Don't use callbacks
 // TODO: Repair toasts on submit
 class BeeRepository(context: Context) {
 
@@ -69,9 +68,8 @@ class BeeRepository(context: Context) {
 
     private fun insertOrUpdateGoalTimings(
             user: String,
-            list: List<Goal>,
-            callback: () -> Unit = {}
-    ) = launch {
+            list: List<Goal>
+    ) = async {
         list.map { goal ->
             val goalTiming =
                     goalTimingDao.findOneBySlug(goal.slug)
@@ -81,7 +79,6 @@ class BeeRepository(context: Context) {
         }.let { goalTimings ->
             goalTimingDao.insert(goalTimings)
         }
-        callback()
     }
 
     private fun insertStatusChange(
@@ -127,9 +124,8 @@ class BeeRepository(context: Context) {
         try {
             val response = CustomApp.instance.api.getGoals(user, accessToken).await()
             response?.body()?.apply {
-                insertOrUpdateGoalTimings(user, this) {
-                    insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
-                }
+                insertOrUpdateGoalTimings(user, this).await()
+                insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
             }
         } catch (e: IOException) {
             insertStatusChange(
