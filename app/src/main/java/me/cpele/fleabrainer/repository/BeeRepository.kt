@@ -81,12 +81,8 @@ class BeeRepository(context: Context) {
         }
     }
 
-    private fun insertStatusChange(
-            status: StatusChange,
-            callback: () -> Unit = {}
-    ) = launch {
+    private fun insertStatusChange(status: StatusChange) = async {
         statusChangeDao.insert(status)
-        callback()
     }
 
     private fun updateGoalTiming(goalTiming: GoalTiming) = launch {
@@ -111,12 +107,14 @@ class BeeRepository(context: Context) {
             } else {
                 val errorMsg = "Error loading user: status ${response?.code()}"
                 val errorStatus = Status.authError(errorMsg)
-                insertStatusChange(StatusChange(status = errorStatus), callback)
+                insertStatusChange(StatusChange(status = errorStatus)).await()
+                callback()
             }
         } catch (e: IOException) {
-            insertStatusChange(
-                    StatusChange(status = Status.failure("Error loading user", e)),
-                    callback)
+            insertStatusChange(StatusChange(status = Status.failure(
+                    "Error loading user", e))
+            ).await()
+            callback()
         }
     }
 
@@ -125,13 +123,14 @@ class BeeRepository(context: Context) {
             val response = CustomApp.instance.api.getGoals(user, accessToken).await()
             response?.body()?.apply {
                 insertOrUpdateGoalTimings(user, this).await()
-                insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
+                insertStatusChange(StatusChange(status = Status.SUCCESS)).await()
+                callback()
             }
         } catch (e: IOException) {
-            insertStatusChange(
-                    StatusChange(status = Status.failure("Error loading goals", e)),
-                    callback
-            )
+            insertStatusChange(StatusChange(status = Status.failure(
+                    "Error loading goals", e
+            ))).await()
+            callback()
         }
     }
 
