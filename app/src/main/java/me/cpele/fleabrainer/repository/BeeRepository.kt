@@ -22,9 +22,10 @@ import me.cpele.fleabrainer.domain.*
 import me.cpele.fleabrainer.ui.CustomApp
 import java.io.IOException
 import java.util.*
-import java.util.concurrent.Executor
 
-class BeeRepository(context: Context, private val executor: Executor) {
+// TODO: Don't use callbacks
+// TODO: Repair toasts on submit
+class BeeRepository(context: Context) {
 
     private val database: CustomDatabase = Room
             .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
@@ -208,9 +209,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
         }
     }
 
-    // TODO Remove executor
-    private fun asyncDeleteDatapointById(id: String) {
-        executor.execute { datapointDao.deleteById(id) }
+    private fun asyncDeleteDatapointById(id: String) = launch {
+        datapointDao.deleteById(id)
     }
 
     private fun enqueueDatapoint(
@@ -218,43 +218,39 @@ class BeeRepository(context: Context, private val executor: Executor) {
             goalSlug: String,
             datapointValue: Float,
             comment: String
-    ) {
-        executor.execute {
-            val datapoint = DatapointBo(
-                    id = UUID.randomUUID().toString(),
-                    goalSlug = goalSlug,
-                    userName = userName,
-                    datapointValue = datapointValue,
-                    comment = comment,
-                    pending = true,
-                    updatedAt = Date()
-            )
-            datapointDao.insertOne(datapoint)
-        }
+    ) = launch {
+        val datapoint = DatapointBo(
+                id = UUID.randomUUID().toString(),
+                goalSlug = goalSlug,
+                userName = userName,
+                datapointValue = datapointValue,
+                comment = comment,
+                pending = true,
+                updatedAt = Date()
+        )
+        datapointDao.insertOne(datapoint)
     }
 
-    private fun postQueuedDatapoints(accessToken: String, userName: String, callback: () -> Unit) {
-        executor.execute {
-            val pendingDatapoints = datapointDao.findPendingByUser(userName)
-            Log.d(javaClass.simpleName, "Found pending datapoints: $pendingDatapoints")
-            pendingDatapoints.forEach { datapoint ->
-                datapoint.pending = false
-                datapointDao.insertOne(datapoint)
-                val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
-                goalTiming?.let {
-                    postDatapoint(
-                            datapoint.id,
-                            userName,
-                            datapoint.goalSlug,
-                            datapoint.datapointValue,
-                            datapoint.comment,
-                            accessToken,
-                            indicateStatusChange = false
-                    )
-                }
+    private fun postQueuedDatapoints(accessToken: String, userName: String, callback: () -> Unit) = launch {
+        val pendingDatapoints = datapointDao.findPendingByUser(userName)
+        Log.d(javaClass.simpleName, "Found pending datapoints: $pendingDatapoints")
+        pendingDatapoints.forEach { datapoint ->
+            datapoint.pending = false
+            datapointDao.insertOne(datapoint)
+            val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
+            goalTiming?.let {
+                postDatapoint(
+                        datapoint.id,
+                        userName,
+                        datapoint.goalSlug,
+                        datapoint.datapointValue,
+                        datapoint.comment,
+                        accessToken,
+                        indicateStatusChange = false
+                )
             }
-            callback()
         }
+        callback()
     }
 
     fun findGoalTimingBySlug(slug: String): GoalTiming? = goalTimingDao.findOneBySlug(slug)
@@ -263,41 +259,32 @@ class BeeRepository(context: Context, private val executor: Executor) {
         return goalTimingDao.asyncFindOneBySlug(slug)
     }
 
-    fun forceRefreshGoalTimingBySlug(slug: String) {
-        executor.execute {
-            goalTimingDao
-                    .findOneBySlug(slug)
-                    ?.let { goalTimingDao.insertOne(it) }
+    fun forceRefreshGoalTimingBySlug(slug: String) = launch {
+        goalTimingDao
+                .findOneBySlug(slug)
+                ?.let { goalTimingDao.insertOne(it) }
+    }
+
+    fun asyncToggleStopwatch(slug: String) = launch {
+        val goalTiming = goalTimingDao.findOneBySlug(slug)
+        goalTiming?.stopwatch?.apply {
+            toggle()
+            persist(goalTiming)
         }
     }
 
-    fun asyncToggleStopwatch(slug: String) {
-        executor.execute {
-            val goalTiming = goalTimingDao.findOneBySlug(slug)
-            goalTiming?.stopwatch?.apply {
-                toggle()
-                persist(goalTiming)
-            }
-
+    fun asyncCancelStopwatch(slug: String) = launch {
+        val goalTiming = goalTimingDao.findOneBySlug(slug)
+        goalTiming?.stopwatch?.apply {
+            clear()
+            persist(goalTiming)
         }
     }
 
-    fun asyncCancelStopwatch(slug: String) {
-        executor.execute {
-            val goalTiming = goalTimingDao.findOneBySlug(slug)
-            goalTiming?.stopwatch?.apply {
-                clear()
-                persist(goalTiming)
-            }
-        }
-    }
-
-    fun asyncSubmit(slug: String, accessToken: String) {
-        executor.execute {
-            val goalTiming = goalTimingDao.findOneBySlug(slug)
-            goalTiming?.apply {
-                submit(this, accessToken)
-            }
+    fun asyncSubmit(slug: String, accessToken: String) = launch {
+        val goalTiming = goalTimingDao.findOneBySlug(slug)
+        goalTiming?.apply {
+            submit(this, accessToken)
         }
     }
 

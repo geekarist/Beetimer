@@ -52,7 +52,7 @@ class CustomApp : Application() {
     }
 
     val beeRepository: BeeRepository by lazy {
-        BeeRepository(this, executors.disk)
+        BeeRepository(this)
     }
 }
 
