@@ -100,9 +100,8 @@ class BeeRepository(context: Context) {
             val response = CustomApp.instance.api.getUser(accessToken).await()
             if (response?.isSuccessful == true) {
                 response.body()?.apply {
-                    postQueuedDatapoints(accessToken, username) {
-                        fetchGoals(accessToken, username, callback)
-                    }
+                    postQueuedDatapoints(accessToken, username).await()
+                    fetchGoals(accessToken, username, callback)
                 }
             } else {
                 val errorMsg = "Error loading user: status ${response?.code()}"
@@ -226,7 +225,7 @@ class BeeRepository(context: Context) {
         datapointDao.insertOne(datapoint)
     }
 
-    private fun postQueuedDatapoints(accessToken: String, userName: String, callback: () -> Unit) = launch {
+    private fun postQueuedDatapoints(accessToken: String, userName: String) = async {
         val pendingDatapoints = datapointDao.findPendingByUser(userName)
         Log.d(javaClass.simpleName, "Found pending datapoints: $pendingDatapoints")
         pendingDatapoints.forEach { datapoint ->
@@ -245,7 +244,6 @@ class BeeRepository(context: Context) {
                 )
             }
         }
-        callback()
     }
 
     fun findGoalTimingBySlug(slug: String): GoalTiming? = goalTimingDao.findOneBySlug(slug)
