@@ -8,8 +8,10 @@ import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import me.cpele.fleabrainer.api.Datapoint
 import me.cpele.fleabrainer.api.Goal
 import me.cpele.fleabrainer.database.CustomDatabase
@@ -99,7 +101,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
     private fun fetchUser(accessToken: String, callback: () -> Unit) {
         insertStatusChange(StatusChange(status = Status.LOADING))
 
-        launch(UI) {
+        launch {
             try {
                 val response = CustomApp.instance.api.getUser(accessToken).await()
                 if (response?.isSuccessful == true) {
@@ -122,7 +124,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
     }
 
     private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit = {}) {
-        launch(UI) {
+        launch {
             try {
                 val response = CustomApp.instance.api.getGoals(user, accessToken).await()
                 response?.body()?.apply {
@@ -173,7 +175,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
     ) {
         if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.LOADING))
 
-        launch(UI) {
+        launch {
             try {
                 CustomApp.instance.api.postDatapoint(
                         userName,
@@ -192,10 +194,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
                 datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
                 asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
-                launch(CommonPool) {
-                    delay(5000)
-                    fetchGoals(accessToken, userName)
-                }
+
+                delay(5000)
+                fetchGoals(accessToken, userName)
 
             } catch (e: IOException) {
                 val tag = BeeRepository::class.java.simpleName
@@ -312,7 +313,7 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
         insertStatusChange(StatusChange(status = Status.LOADING))
 
-        launch(UI) {
+        launch {
 
             try {
                 val response = CustomApp.instance.api.getDataPoints(userName, slug, accessToken).await()
