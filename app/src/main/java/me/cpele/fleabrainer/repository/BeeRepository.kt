@@ -83,11 +83,12 @@ class BeeRepository(context: Context, private val executor: Executor) {
         callback()
     }
 
-    private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) {
-        launch {
-            statusChangeDao.insert(status)
-            callback()
-        }
+    private fun insertStatusChange(
+            status: StatusChange,
+            callback: () -> Unit = {}
+    ) = launch {
+        statusChangeDao.insert(status)
+        callback()
     }
 
     private fun updateGoalTiming(goalTiming: GoalTiming) = launch {
@@ -98,46 +99,42 @@ class BeeRepository(context: Context, private val executor: Executor) {
         authToken?.apply { fetchUser(this, callback) }
     }
 
-    private fun fetchUser(accessToken: String, callback: () -> Unit) {
+    private fun fetchUser(accessToken: String, callback: () -> Unit) = launch {
         insertStatusChange(StatusChange(status = Status.LOADING))
 
-        launch {
-            try {
-                val response = CustomApp.instance.api.getUser(accessToken).await()
-                if (response?.isSuccessful == true) {
-                    response.body()?.apply {
-                        postQueuedDatapoints(accessToken, username) {
-                            fetchGoals(accessToken, username, callback)
-                        }
+        try {
+            val response = CustomApp.instance.api.getUser(accessToken).await()
+            if (response?.isSuccessful == true) {
+                response.body()?.apply {
+                    postQueuedDatapoints(accessToken, username) {
+                        fetchGoals(accessToken, username, callback)
                     }
-                } else {
-                    val errorMsg = "Error loading user: status ${response?.code()}"
-                    val errorStatus = Status.authError(errorMsg)
-                    insertStatusChange(StatusChange(status = errorStatus), callback)
                 }
-            } catch (e: IOException) {
-                insertStatusChange(
-                        StatusChange(status = Status.failure("Error loading user", e)),
-                        callback)
+            } else {
+                val errorMsg = "Error loading user: status ${response?.code()}"
+                val errorStatus = Status.authError(errorMsg)
+                insertStatusChange(StatusChange(status = errorStatus), callback)
             }
+        } catch (e: IOException) {
+            insertStatusChange(
+                    StatusChange(status = Status.failure("Error loading user", e)),
+                    callback)
         }
     }
 
-    private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit = {}) {
-        launch {
-            try {
-                val response = CustomApp.instance.api.getGoals(user, accessToken).await()
-                response?.body()?.apply {
-                    insertOrUpdateGoalTimings(user, this) {
-                        insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
-                    }
+    private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit = {}) = launch {
+        try {
+            val response = CustomApp.instance.api.getGoals(user, accessToken).await()
+            response?.body()?.apply {
+                insertOrUpdateGoalTimings(user, this) {
+                    insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
                 }
-            } catch (e: IOException) {
-                insertStatusChange(
-                        StatusChange(status = Status.failure("Error loading goals", e)),
-                        callback
-                )
             }
+        } catch (e: IOException) {
+            insertStatusChange(
+                    StatusChange(status = Status.failure("Error loading goals", e)),
+                    callback
+            )
         }
     }
 
@@ -172,47 +169,46 @@ class BeeRepository(context: Context, private val executor: Executor) {
             comment: String,
             accessToken: String,
             indicateStatusChange: Boolean = true
-    ) {
+    ) = launch {
         if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.LOADING))
 
-        launch {
-            try {
-                CustomApp.instance.api.postDatapoint(
-                        userName,
-                        goalSlug,
-                        datapointValue,
-                        comment,
-                        accessToken
-                ).await()
+        try {
+            CustomApp.instance.api.postDatapoint(
+                    userName,
+                    goalSlug,
+                    datapointValue,
+                    comment,
+                    accessToken
+            ).await()
 
-                if (indicateStatusChange) {
-                    insertStatusChange(StatusChange(
-                            status = Status.SUCCESS,
-                            message = "Datapoint submitted successfully"
-                    ))
-                }
-
-                datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
-                asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
-
-                delay(5000)
-                fetchGoals(accessToken, userName)
-
-            } catch (e: IOException) {
-                val tag = BeeRepository::class.java.simpleName
-                Log.e(tag, "Error posting goal timing", e)
-                if (indicateStatusChange) {
-                    insertStatusChange(StatusChange(
-                            status = Status.FAILURE,
-                            message = "Submission failed: datapoint stored locally until next sync"
-                    ))
-                }
-                datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
-                enqueueDatapoint(userName, goalSlug, datapointValue, comment)
+            if (indicateStatusChange) {
+                insertStatusChange(StatusChange(
+                        status = Status.SUCCESS,
+                        message = "Datapoint submitted successfully"
+                ))
             }
+
+            datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
+            asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
+
+            delay(5000)
+            fetchGoals(accessToken, userName)
+
+        } catch (e: IOException) {
+            val tag = BeeRepository::class.java.simpleName
+            Log.e(tag, "Error posting goal timing", e)
+            if (indicateStatusChange) {
+                insertStatusChange(StatusChange(
+                        status = Status.FAILURE,
+                        message = "Submission failed: datapoint stored locally until next sync"
+                ))
+            }
+            datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
+            enqueueDatapoint(userName, goalSlug, datapointValue, comment)
         }
     }
 
+    // TODO Remove executor
     private fun asyncDeleteDatapointById(id: String) {
         executor.execute { datapointDao.deleteById(id) }
     }
