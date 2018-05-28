@@ -28,7 +28,7 @@ class BeeRepository(context: Context) {
 
     private val database: CustomDatabase = Room
             .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
-            .addMigrations(Companion.MIGRATION_1_TO_2, Companion.MIGRATION_2_TO_3)
+            .addMigrations(MIGRATION_1_TO_2, MIGRATION_2_TO_3)
             .build()
 
     companion object {
@@ -239,8 +239,6 @@ class BeeRepository(context: Context) {
             }
         }
     }
-
-    fun findGoalTimingBySlug(slug: String): GoalTiming? = goalTimingDao.findOneBySlug(slug)
 
     fun asyncFindGoalTimingBySlug(slug: String): LiveData<GoalTiming> {
         return goalTimingDao.asyncFindOneBySlug(slug)
