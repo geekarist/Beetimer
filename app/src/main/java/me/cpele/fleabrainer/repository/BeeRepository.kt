@@ -89,11 +89,11 @@ class BeeRepository(context: Context) {
         goalTimingDao.insertOne(goalTiming)
     }
 
-    fun fetch(authToken: String?, callback: () -> Unit = {}) {
-        authToken?.apply { fetchUser(this, callback) }
+    fun fetch(authToken: String?) {
+        authToken?.apply { fetchUser(this) }
     }
 
-    private fun fetchUser(accessToken: String, callback: () -> Unit) = launch {
+    private fun fetchUser(accessToken: String) = launch {
         insertStatusChange(StatusChange(status = Status.LOADING))
 
         try {
@@ -101,35 +101,29 @@ class BeeRepository(context: Context) {
             if (response?.isSuccessful == true) {
                 response.body()?.apply {
                     postQueuedDatapoints(accessToken, username).await()
-                    fetchGoals(accessToken, username, callback)
+                    fetchGoals(accessToken, username)
                 }
             } else {
                 val errorMsg = "Error loading user: status ${response?.code()}"
                 val errorStatus = Status.authError(errorMsg)
-                insertStatusChange(StatusChange(status = errorStatus)).await()
-                callback()
+                insertStatusChange(StatusChange(status = errorStatus))
             }
         } catch (e: IOException) {
             insertStatusChange(StatusChange(status = Status.failure(
                     "Error loading user", e))
-            ).await()
-            callback()
+            )
         }
     }
 
-    private fun fetchGoals(accessToken: String, user: String, callback: () -> Unit = {}) = launch {
+    private fun fetchGoals(accessToken: String, user: String) = launch {
         try {
             val response = CustomApp.instance.api.getGoals(user, accessToken).await()
             response?.body()?.apply {
                 insertOrUpdateGoalTimings(user, this).await()
-                insertStatusChange(StatusChange(status = Status.SUCCESS)).await()
-                callback()
+                insertStatusChange(StatusChange(status = Status.SUCCESS))
             }
         } catch (e: IOException) {
-            insertStatusChange(StatusChange(status = Status.failure(
-                    "Error loading goals", e
-            ))).await()
-            callback()
+            insertStatusChange(StatusChange(status = Status.failure("Error loading goals", e)))
         }
     }
 
