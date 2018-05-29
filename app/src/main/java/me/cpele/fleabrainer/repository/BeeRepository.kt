@@ -175,10 +175,10 @@ class BeeRepository(context: Context) {
             ).await()
 
             if (indicateStatusChange) {
-                _submissionResult.value = StatusChange(
+                _submissionResult.postValue(StatusChange(
                         status = Status.SUCCESS,
                         message = "Datapoint submitted successfully"
-                )
+                ))
             }
 
             datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
@@ -187,14 +187,17 @@ class BeeRepository(context: Context) {
             delay(5000)
             fetchGoals(accessToken, userName)
 
+            if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.SUCCESS))
+
         } catch (e: IOException) {
             val tag = BeeRepository::class.java.simpleName
             Log.e(tag, "Error posting goal timing", e)
             if (indicateStatusChange) {
-                _submissionResult.value = StatusChange(
+                _submissionResult.postValue(StatusChange(
                         status = Status.FAILURE,
                         message = "Submission failed: datapoint stored locally until next sync"
-                )
+                ))
+                insertStatusChange(StatusChange(status = Status.FAILURE))
             }
             datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
             enqueueDatapoint(userName, goalSlug, datapointValue, comment)
