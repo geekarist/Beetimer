@@ -16,6 +16,7 @@ class MainViewModel(
 
     val status: LiveData<StatusChange> = repository.latestStatus
     val goalTimings: LiveData<List<GoalTiming>> = repository.goalTimings
+    val submissionResult: LiveData<StatusChange> = repository.submissionResult
 
     fun refresh() = repository.fetch(authToken)
 

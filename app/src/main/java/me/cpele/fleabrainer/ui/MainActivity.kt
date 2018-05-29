@@ -102,6 +102,9 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
             if (it?.status == Status.AUTH_ERROR) {
                 SignInActivity.start(context = this@MainActivity, clearToken = true)
             }
+        })
+
+        viewModel.submissionResult.observe(this, Observer {
             it?.message?.apply {
                 Toast.makeText(this@MainActivity, this, Toast.LENGTH_LONG).show()
             }

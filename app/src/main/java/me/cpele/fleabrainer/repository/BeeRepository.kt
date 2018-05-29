@@ -2,6 +2,7 @@ package me.cpele.fleabrainer.repository
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
@@ -131,6 +132,9 @@ class BeeRepository(context: Context) {
         updateGoalTiming(goalTiming)
     }
 
+    private val _submissionResult: MutableLiveData<StatusChange> = MutableLiveData()
+    val submissionResult: LiveData<StatusChange> = _submissionResult
+
     fun submit(goalTiming: GoalTiming, accessToken: String) {
 
         val userName = goalTiming.user
@@ -171,10 +175,10 @@ class BeeRepository(context: Context) {
             ).await()
 
             if (indicateStatusChange) {
-                insertStatusChange(StatusChange(
+                _submissionResult.value = StatusChange(
                         status = Status.SUCCESS,
                         message = "Datapoint submitted successfully"
-                ))
+                )
             }
 
             datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
@@ -187,10 +191,10 @@ class BeeRepository(context: Context) {
             val tag = BeeRepository::class.java.simpleName
             Log.e(tag, "Error posting goal timing", e)
             if (indicateStatusChange) {
-                insertStatusChange(StatusChange(
+                _submissionResult.value = StatusChange(
                         status = Status.FAILURE,
                         message = "Submission failed: datapoint stored locally until next sync"
-                ))
+                )
             }
             datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
             enqueueDatapoint(userName, goalSlug, datapointValue, comment)
