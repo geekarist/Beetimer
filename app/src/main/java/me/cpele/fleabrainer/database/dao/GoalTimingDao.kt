@@ -12,7 +12,7 @@ interface GoalTimingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(list: List<GoalTiming>)
 
-    @Query("SELECT * FROM GoalTiming")
+    @Query("SELECT * FROM GoalTiming ORDER BY losedate ASC")
     fun findAll(): LiveData<List<GoalTiming>>
 
     @Query("SELECT * FROM GoalTiming WHERE slug = :slug")
