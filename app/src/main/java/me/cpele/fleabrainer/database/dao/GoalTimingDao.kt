@@ -15,6 +15,9 @@ interface GoalTimingDao {
     @Query("SELECT * FROM GoalTiming ORDER BY losedate ASC")
     fun findAll(): LiveData<List<GoalTiming>>
 
+    @Query("SELECT * FROM GoalTiming")
+    fun findAllSync(): List<GoalTiming>
+
     @Query("SELECT * FROM GoalTiming WHERE slug = :slug")
     fun findOneBySlug(slug: String): GoalTiming?
 

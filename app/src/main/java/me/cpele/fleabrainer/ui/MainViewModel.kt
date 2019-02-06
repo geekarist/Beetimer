@@ -37,5 +37,7 @@ class MainViewModel(
                         .getString(SignInActivity.PREF_ACCESS_TOKEN, null)
         )
     }
+
+    fun toggleThenStopOthers(slug: String) = repository.toggleThenStopOthers(slug)
 }
 

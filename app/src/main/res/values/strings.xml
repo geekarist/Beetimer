@@ -19,6 +19,6 @@
     <string name="detail_start">Start</string>
     <string name="detail_submit">Submit</string>
     <string name="detail_cancel">Cancel</string>
-
     <string name="detail_item_sync_in_progress">Sync in progress</string>
+    <string name="detail_other_timers_stopping">Stopping other timers…</string>
 </resources>

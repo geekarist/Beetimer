@@ -26,9 +26,9 @@ import java.util.concurrent.Executor
 class BeeRepository(context: Context, private val executor: Executor) {
 
     private val database: CustomDatabase = Room
-            .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
-            .addMigrations(Companion.MIGRATION_1_TO_2, Companion.MIGRATION_2_TO_3)
-            .build()
+        .databaseBuilder(context, CustomDatabase::class.java, context.packageName)
+        .addMigrations(MIGRATION_1_TO_2, MIGRATION_2_TO_3)
+        .build()
 
     companion object {
         private val MIGRATION_1_TO_2 = object : Migration(1, 2) {
@@ -50,34 +50,40 @@ class BeeRepository(context: Context, private val executor: Executor) {
     val latestStatus: LiveData<StatusChange>
         get() {
             val distinctLiveData = MediatorLiveData<StatusChange>()
-            distinctLiveData.addSource(statusChangeDao.findLatestStatus(), object : Observer<StatusChange> {
-                var previousValue: StatusChange? = null
-                override fun onChanged(value: StatusChange?) {
-                    val isChanging = value?.status != previousValue?.status
-                    if (isChanging) {
-                        previousValue = value
-                        distinctLiveData.value = value
+            distinctLiveData.addSource(
+                statusChangeDao.findLatestStatus(),
+                object : Observer<StatusChange> {
+                    var previousValue: StatusChange? = null
+                    override fun onChanged(value: StatusChange?) {
+                        val isChanging = value?.status != previousValue?.status
+                        if (isChanging) {
+                            previousValue = value
+                            distinctLiveData.value = value
+                        }
                     }
-                }
-            })
+                })
             return distinctLiveData
         }
 
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
 
-    private fun insertOrUpdateGoalTimings(user: String, list: List<Goal>, callback: () -> Unit = {}) =
-            executor.execute {
-                list.map { goal ->
-                    val goalTiming =
-                            goalTimingDao.findOneBySlug(goal.slug)
-                                    ?: GoalTiming(user = user, goal = goal, stopwatch = Stopwatch())
-                    goalTiming.goal = goal
-                    goalTiming
-                }.let { goalTimings ->
-                    goalTimingDao.insert(goalTimings)
-                }
-                callback()
+    private fun insertOrUpdateGoalTimings(
+        user: String,
+        list: List<Goal>,
+        callback: () -> Unit = {}
+    ) =
+        executor.execute {
+            list.map { goal ->
+                val goalTiming =
+                    goalTimingDao.findOneBySlug(goal.slug)
+                        ?: GoalTiming(user = user, goal = goal, stopwatch = Stopwatch())
+                goalTiming.goal = goal
+                goalTiming
+            }.let { goalTimings ->
+                goalTimingDao.insert(goalTimings)
             }
+            callback()
+        }
 
     private fun insertStatusChange(status: StatusChange, callback: () -> Unit = {}) {
         executor.execute {
@@ -101,8 +107,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 insertStatusChange(
-                        StatusChange(status = Status.failure("Error loading user", t)),
-                        callback)
+                    StatusChange(status = Status.failure("Error loading user", t)),
+                    callback
+                )
             }
 
             override fun onResponse(call: Call<User>?, response: Response<User>?) {
@@ -126,8 +133,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
         CustomApp.instance.api.getGoals(user, accessToken).enqueue(object : Callback<List<Goal>> {
             override fun onFailure(call: Call<List<Goal>>?, t: Throwable?) {
                 insertStatusChange(
-                        StatusChange(status = Status.failure("Error loading goals", t)),
-                        callback)
+                    StatusChange(status = Status.failure("Error loading goals", t)),
+                    callback
+                )
             }
 
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
@@ -155,58 +163,62 @@ class BeeRepository(context: Context, private val executor: Executor) {
         persist(goalTiming)
 
         postDatapoint(
-                userName = userName,
-                goalSlug = goalSlug,
-                datapointValue = datapointValue,
-                comment = comment,
-                accessToken = accessToken
+            userName = userName,
+            goalSlug = goalSlug,
+            datapointValue = datapointValue,
+            comment = comment,
+            accessToken = accessToken
         )
     }
 
     private fun postDatapoint(
-            datapointId: String? = null,
-            userName: String,
-            goalSlug: String,
-            datapointValue: Float,
-            comment: String,
-            accessToken: String,
-            indicateStatusChange: Boolean = true
+        datapointId: String? = null,
+        userName: String,
+        goalSlug: String,
+        datapointValue: Float,
+        comment: String,
+        accessToken: String,
+        indicateStatusChange: Boolean = true
     ) {
         if (indicateStatusChange) insertStatusChange(StatusChange(status = Status.LOADING))
 
         CustomApp.instance.api
-                .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
-                .enqueue(object : Callback<Datapoint> {
+            .postDatapoint(userName, goalSlug, datapointValue, comment, accessToken)
+            .enqueue(object : Callback<Datapoint> {
 
-                    override fun onFailure(call: Call<Datapoint>?, t: Throwable?) {
-                        val tag = BeeRepository::class.java.simpleName
-                        Log.e(tag, "Error posting goal timing: ", t)
-                        if (indicateStatusChange) {
-                            insertStatusChange(StatusChange(
-                                    status = Status.FAILURE,
-                                    message =
-                                    "Submission failed: datapoint stored locally until next sync"
-                            ))
-                        }
-                        datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
-                        enqueueDatapoint(userName, goalSlug, datapointValue, comment)
+                override fun onFailure(call: Call<Datapoint>?, t: Throwable?) {
+                    val tag = BeeRepository::class.java.simpleName
+                    Log.e(tag, "Error posting goal timing: ", t)
+                    if (indicateStatusChange) {
+                        insertStatusChange(
+                            StatusChange(
+                                status = Status.FAILURE,
+                                message =
+                                "Submission failed: datapoint stored locally until next sync"
+                            )
+                        )
                     }
+                    datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
+                    enqueueDatapoint(userName, goalSlug, datapointValue, comment)
+                }
 
-                    override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
-                        if (indicateStatusChange) {
-                            insertStatusChange(StatusChange(
-                                    status = Status.SUCCESS,
-                                    message = "Datapoint submitted successfully"
-                            ))
-                        }
-                        datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
-                        asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
-                        executor.execute {
-                            Thread.sleep(5000)
-                            fetchGoals(accessToken, userName)
-                        }
+                override fun onResponse(call: Call<Datapoint>?, response: Response<Datapoint>?) {
+                    if (indicateStatusChange) {
+                        insertStatusChange(
+                            StatusChange(
+                                status = Status.SUCCESS,
+                                message = "Datapoint submitted successfully"
+                            )
+                        )
                     }
-                })
+                    datapointId?.let(this@BeeRepository::asyncDeleteDatapointById)
+                    asyncFindDatapointsBySlug(goalSlug, userName, accessToken)
+                    executor.execute {
+                        Thread.sleep(5000)
+                        fetchGoals(accessToken, userName)
+                    }
+                }
+            })
     }
 
     private fun asyncDeleteDatapointById(id: String) {
@@ -214,20 +226,20 @@ class BeeRepository(context: Context, private val executor: Executor) {
     }
 
     private fun enqueueDatapoint(
-            userName: String,
-            goalSlug: String,
-            datapointValue: Float,
-            comment: String
+        userName: String,
+        goalSlug: String,
+        datapointValue: Float,
+        comment: String
     ) {
         executor.execute {
             val datapoint = DatapointBo(
-                    id = UUID.randomUUID().toString(),
-                    goalSlug = goalSlug,
-                    userName = userName,
-                    datapointValue = datapointValue,
-                    comment = comment,
-                    pending = true,
-                    updatedAt = Date()
+                id = UUID.randomUUID().toString(),
+                goalSlug = goalSlug,
+                userName = userName,
+                datapointValue = datapointValue,
+                comment = comment,
+                pending = true,
+                updatedAt = Date()
             )
             datapointDao.insertOne(datapoint)
         }
@@ -243,21 +255,19 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 val goalTiming = goalTimingDao.findOneBySlug(datapoint.goalSlug)
                 goalTiming?.let {
                     postDatapoint(
-                            datapoint.id,
-                            userName,
-                            datapoint.goalSlug,
-                            datapoint.datapointValue,
-                            datapoint.comment,
-                            accessToken,
-                            indicateStatusChange = false
+                        datapoint.id,
+                        userName,
+                        datapoint.goalSlug,
+                        datapoint.datapointValue,
+                        datapoint.comment,
+                        accessToken,
+                        indicateStatusChange = false
                     )
                 }
             }
             callback()
         }
     }
-
-    fun findGoalTimingBySlug(slug: String): GoalTiming? = goalTimingDao.findOneBySlug(slug)
 
     fun asyncFindGoalTimingBySlug(slug: String): LiveData<GoalTiming> {
         return goalTimingDao.asyncFindOneBySlug(slug)
@@ -266,19 +276,8 @@ class BeeRepository(context: Context, private val executor: Executor) {
     fun forceRefreshGoalTimingBySlug(slug: String) {
         executor.execute {
             goalTimingDao
-                    .findOneBySlug(slug)
-                    ?.let { goalTimingDao.insertOne(it) }
-        }
-    }
-
-    fun asyncToggleStopwatch(slug: String) {
-        executor.execute {
-            val goalTiming = goalTimingDao.findOneBySlug(slug)
-            goalTiming?.stopwatch?.apply {
-                toggle()
-                persist(goalTiming)
-            }
-
+                .findOneBySlug(slug)
+                ?.let { goalTimingDao.insertOne(it) }
         }
     }
 
@@ -302,40 +301,44 @@ class BeeRepository(context: Context, private val executor: Executor) {
     }
 
     fun asyncFindDatapointsBySlug(
-            slug: String,
-            userName: String,
-            accessToken: String
+        slug: String,
+        userName: String,
+        accessToken: String
     ): LiveData<List<DatapointBo>> {
 
         insertStatusChange(StatusChange(status = Status.LOADING))
 
         CustomApp.instance.api
-                .getDataPoints(userName, slug, accessToken)
-                .enqueue(object : Callback<List<Datapoint>> {
-                    override fun onFailure(call: Call<List<Datapoint>>?, t: Throwable?) {
-                        insertStatusChange(StatusChange(
-                                status = Status.FAILURE,
-                                message = "Error getting datapoints"
-                        ))
-                        Log.w(BeeRepository::class.java.simpleName, t)
-                    }
+            .getDataPoints(userName, slug, accessToken)
+            .enqueue(object : Callback<List<Datapoint>> {
+                override fun onFailure(call: Call<List<Datapoint>>?, t: Throwable?) {
+                    insertStatusChange(
+                        StatusChange(
+                            status = Status.FAILURE,
+                            message = "Error getting datapoints"
+                        )
+                    )
+                    Log.w(BeeRepository::class.java.simpleName, t)
+                }
 
-                    override fun onResponse(
-                            call: Call<List<Datapoint>>?,
-                            response: Response<List<Datapoint>>?
-                    ) {
-                        val body = response?.body()
-                        if (body != null) {
-                            insertDatapoints(body, userName, slug)
-                            insertStatusChange(StatusChange(status = Status.SUCCESS))
-                        } else {
-                            insertStatusChange(StatusChange(
-                                    status = Status.FAILURE,
-                                    message = "Response received but body is null"
-                            ))
-                        }
+                override fun onResponse(
+                    call: Call<List<Datapoint>>?,
+                    response: Response<List<Datapoint>>?
+                ) {
+                    val body = response?.body()
+                    if (body != null) {
+                        insertDatapoints(body, userName, slug)
+                        insertStatusChange(StatusChange(status = Status.SUCCESS))
+                    } else {
+                        insertStatusChange(
+                            StatusChange(
+                                status = Status.FAILURE,
+                                message = "Response received but body is null"
+                            )
+                        )
                     }
-                })
+                }
+            })
 
         return datapointDao.findBySlug(userName, slug)
     }
@@ -344,15 +347,26 @@ class BeeRepository(context: Context, private val executor: Executor) {
         executor.execute {
             datapointDao.insert(body.map {
                 DatapointBo(
-                        id = it.id,
-                        goalSlug = slug,
-                        userName = userName,
-                        datapointValue = it.value.toFloat(),
-                        comment = it.comment,
-                        pending = false,
-                        updatedAt = it.updated_at
+                    id = it.id,
+                    goalSlug = slug,
+                    userName = userName,
+                    datapointValue = it.value.toFloat(),
+                    comment = it.comment,
+                    pending = false,
+                    updatedAt = it.updated_at
                 )
             })
         }
+    }
+
+    fun toggleThenStopOthers(slugToToggle: String) = executor.execute {
+        goalTimingDao.findAllSync()
+            .forEach {
+                when (it.goal.slug) {
+                    slugToToggle -> it.stopwatch.toggle()
+                    else -> it.stopwatch.stop()
+                }
+                goalTimingDao.insertOne(it)
+            }
     }
 }

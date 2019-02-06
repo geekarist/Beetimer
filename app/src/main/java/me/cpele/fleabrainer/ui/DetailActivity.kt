@@ -35,32 +35,29 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private val slug: String
-        get () {
-            return intent.getStringExtra(ARG_SLUG)
-                    ?: throw IllegalStateException(
-                            "Slug should not be null. Did you use the start() method for instantiation?")
-        }
+        get () = intent.getStringExtra(ARG_SLUG)
+            ?: throw IllegalStateException(
+                "Slug should not be null. Did you use the start() method for instantiation?"
+            )
 
     private val userName: String
-        get () {
-            return intent.getStringExtra(ARG_USER_NAME)
-                    ?: throw IllegalStateException(
-                            "User name should not be null. Did you use the start() method for instantiation?")
-        }
+        get () = intent.getStringExtra(ARG_USER_NAME)
+            ?: throw IllegalStateException(
+                "User name should not be null. Did you use the start() method for instantiation?"
+            )
 
     private lateinit var adapter: DetailAdapter
 
     private val viewModel: DetailViewModel
-        get() {
-            return ViewModelProviders.of(
-                    this,
-                    DetailViewModel.Factory(
-                            CustomApp.instance.beeRepository,
-                            userName,
-                            slug
-                    )
-            ).get(DetailViewModel::class.java)
-        }
+        get() = ViewModelProviders.of(
+            this,
+            DetailViewModel.Factory(
+                application,
+                CustomApp.instance.beeRepository,
+                userName,
+                slug
+            )
+        ).get(DetailViewModel::class.java)
 
     private val handler = Handler()
 
@@ -80,8 +77,8 @@ class DetailActivity : AppCompatActivity() {
         detailBinding.model = viewModel
         detailBinding.listener = this
 
-        detailBinding.detailViewTimer?.model = viewModel
-        detailBinding.detailViewTimer?.listener = this
+        detailBinding.detailViewTimer.model = viewModel
+        detailBinding.detailViewTimer.listener = this
 
         setContentView(view)
         supportActionBar?.subtitle = intent.getStringExtra(ARG_SLUG)
@@ -106,7 +103,7 @@ class DetailActivity : AppCompatActivity() {
         handler.post(runnableForceRefresh)
 
         viewModel.findDatapoints(this).observe(this, Observer {
-            it?.apply({
+            it?.apply {
                 adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                         detail_datapoints.scrollToPosition(positionStart)
@@ -114,29 +111,27 @@ class DetailActivity : AppCompatActivity() {
                     }
                 })
                 adapter.submitList(
-                        this.sortedWith(kotlin.Comparator { p1, p2 ->
-                            val pendingComparison = p2.pending.compareTo(p1.pending)
-                            if (pendingComparison != 0) {
-                                pendingComparison
-                            } else {
-                                p2.updatedAt.compareTo(p1.updatedAt)
-                            }
-                        })
+                    this.sortedWith(kotlin.Comparator { p1, p2 ->
+                        val pendingComparison = p2.pending.compareTo(p1.pending)
+                        if (pendingComparison != 0) {
+                            pendingComparison
+                        } else {
+                            p2.updatedAt.compareTo(p1.updatedAt)
+                        }
+                    })
                 )
-            })
+            }
         })
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+        android.R.id.home -> {
+            finish()
+            true
         }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onPause() {

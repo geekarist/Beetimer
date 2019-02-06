@@ -196,6 +196,8 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         super.onPause()
     }
 
+    override fun toggleThenStopOthers(slug: String) = viewModel.toggleThenStopOthers(slug)
+
     override fun onDestroy() {
         super.onDestroy()
     }

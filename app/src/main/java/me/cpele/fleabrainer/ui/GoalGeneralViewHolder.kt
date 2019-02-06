@@ -48,10 +48,8 @@ class GoalGeneralViewHolder(
         listener.onOpen(goalTiming)
     }
 
-    override fun onClickTimer(goalTiming: GoalTiming) {
-        stopwatch.toggle()
-        listener.onPersist(goalTiming)
-    }
+    override fun onClickTimer(goalTiming: GoalTiming) =
+        listener.toggleThenStopOthers(goalTiming.goal.slug)
 
     override fun onLongClickTimer(goalTiming: GoalTiming): Boolean {
         val wasRunning = stopwatch.running
@@ -100,5 +98,6 @@ class GoalGeneralViewHolder(
         fun onPersist(goalTiming: GoalTiming)
         fun onSubmit(goalTiming: GoalTiming)
         fun onOpen(goalTiming: GoalTiming)
+        fun toggleThenStopOthers(slug: String)
     }
 }
