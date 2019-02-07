@@ -195,14 +195,9 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
 
     override fun onPause() {
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        main_rv.adapter = null
         super.onPause()
     }
 
     override fun toggleThenStopOthers(slug: String) = viewModel.toggleThenStopOthers(slug)
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 }
 
