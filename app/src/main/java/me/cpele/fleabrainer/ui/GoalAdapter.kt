@@ -1,16 +1,25 @@
 package me.cpele.fleabrainer.ui
 
-import android.support.v7.widget.RecyclerView
+import android.support.v7.recyclerview.extensions.ListAdapter
+import android.support.v7.util.DiffUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import me.cpele.fleabrainer.R
 import me.cpele.fleabrainer.databinding.ViewItemBinding
 import me.cpele.fleabrainer.domain.GoalTiming
 
-class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener)
-    : RecyclerView.Adapter<GoalRecyclerViewHolder>() {
+class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener) :
+    ListAdapter<GoalTiming, GoalRecyclerViewHolder>(CustomItemCallback) {
 
-    private var items: MutableList<GoalTiming> = mutableListOf()
+    object CustomItemCallback : DiffUtil.ItemCallback<GoalTiming>() {
+        override fun areItemsTheSame(oldItem: GoalTiming?, newItem: GoalTiming?): Boolean {
+            return (oldItem?.id == newItem?.id)
+        }
+
+        override fun areContentsTheSame(oldItem: GoalTiming?, newItem: GoalTiming?): Boolean {
+            return (oldItem == newItem)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GoalRecyclerViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -20,7 +29,7 @@ class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener)
     }
 
     override fun onBindViewHolder(holder: GoalRecyclerViewHolder, position: Int) {
-        val goalTiming = items[position]
+        val goalTiming = getItem(position)
         holder.bind(goalTiming)
     }
 
@@ -32,16 +41,6 @@ class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener)
     override fun onViewRecycled(holder: GoalRecyclerViewHolder) {
         holder.detach()
     }
-
-    override fun getItemCount(): Int = items.size
-
-    fun refresh(items: List<GoalTiming>) {
-        this.items.clear()
-        this.items.addAll(items)
-        notifyDataSetChanged()
-    }
-
-    fun isEmpty(): Boolean = items.isEmpty()
 
     override fun onViewDetachedFromWindow(holder: GoalRecyclerViewHolder) {
         holder.detach()

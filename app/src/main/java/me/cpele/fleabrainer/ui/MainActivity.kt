@@ -66,12 +66,11 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         }
 
         mAdapter = GoalAdapter(this)
+        main_rv.adapter = mAdapter
     }
 
     override fun onResume() {
         super.onResume()
-
-        main_rv.adapter = mAdapter
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             main_rv.layoutManager = LinearLayoutManager(this)
@@ -111,7 +110,7 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         viewModel.goalTimings.observe(this, Observer {
             Log.d(localClassName, "Activity received goals: $it")
             supportActionBar?.subtitle = it?.firstOrNull()?.user
-            mAdapter.refresh(it?.sorted() ?: emptyList())
+            mAdapter.submitList(it?.sorted() ?: emptyList())
         })
 
         return displayMenu
