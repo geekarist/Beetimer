@@ -6,16 +6,20 @@ import me.cpele.fleabrainer.domain.formatHoursAsDuration
 import java.util.concurrent.TimeUnit
 
 data class Goal(
-        val slug: String,
-        val title: String,
-        val rate: String,
-        val delta_text: String,
-        val losedate: Long,
-        val lane: Int,
-        val yaw: Int,
-        val runits: String,
-        val limsum: String
-) {
+    val slug: String,
+    val title: String,
+    val rate: String,
+    val delta_text: String,
+    val losedate: Long,
+    val lane: Int,
+    val yaw: Int,
+    val runits: String,
+    val limsum: String
+) : Comparable<Goal> {
+
+    override fun compareTo(other: Goal): Int {
+        return (losedate - other.losedate).toInt()
+    }
 
     val color: Int
         @ColorRes
@@ -70,8 +74,8 @@ data class Goal(
             val split = limsum.split(' ')
             return split.firstOrNull()?.let {
                 val rest = split
-                        .filterIndexed { index, s -> index > 0 }
-                        .joinToString(" ")
+                    .filterIndexed { index, s -> index > 0 }
+                    .joinToString(" ")
                 return "${formatHoursAsDuration(it.toFloat())} $rest"
             }
         }

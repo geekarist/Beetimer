@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         viewModel.goalTimings.observe(this, Observer {
             Log.d(localClassName, "Activity received goals: $it")
             supportActionBar?.subtitle = it?.firstOrNull()?.user
-            mAdapter.refresh(it ?: emptyList())
+            mAdapter.refresh(it?.sorted() ?: emptyList())
         })
 
         return displayMenu
