@@ -46,4 +46,19 @@ class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener) :
         holder.detach()
         super.onViewDetachedFromWindow(holder)
     }
+
+    /**
+     * Find the position of the first running item.
+     *
+     * @return the position if an item is running, or else `null`
+     */
+    fun firstRunningItemPosition(): Int? {
+        for (i in 0 until itemCount) {
+            val item = getItem(i)
+            if (item.stopwatch.running) {
+                return i
+            }
+        }
+        return null
+    }
 }

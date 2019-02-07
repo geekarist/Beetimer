@@ -48,8 +48,8 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
 
     private val viewModel: MainViewModel
         get() = ViewModelProviders
-                .of(this, MainViewModel.Factory(repository, extraAuthToken))
-                .get(MainViewModel::class.java)
+            .of(this, MainViewModel.Factory(repository, extraAuthToken))
+            .get(MainViewModel::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(localClassName, "onCreate")
@@ -110,7 +110,11 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         viewModel.goalTimings.observe(this, Observer {
             Log.d(localClassName, "Activity received goals: $it")
             supportActionBar?.subtitle = it?.firstOrNull()?.user
-            mAdapter.submitList(it?.sorted() ?: emptyList())
+            val timings = it?.sorted() ?: emptyList()
+            mAdapter.submitList(timings)
+            mAdapter.firstRunningItemPosition()?.let { pos ->
+                main_rv.smoothScrollToPosition(pos)
+            }
         })
 
         return displayMenu
@@ -154,27 +158,27 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         val item = mMenu?.findItem(R.id.main_menu_sync)
         item?.actionView?.clearAnimation()
         item?.actionView
-                ?.animate()
-                ?.alpha(0f)
-                ?.setDuration(500)
-                ?.setListener(object: Animator.AnimatorListener {
-                    override fun onAnimationRepeat(animation: Animator?) {
-                    }
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(500)
+            ?.setListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
 
-                    override fun onAnimationCancel(animation: Animator?) {
-                    }
+                override fun onAnimationCancel(animation: Animator?) {
+                }
 
-                    override fun onAnimationStart(animation: Animator?) {
-                        val itemImageView: ImageView? = item.actionView as ImageView?
-                        itemImageView?.setImageResource(R.drawable.ic_check_circle_white_24dp)
-                    }
+                override fun onAnimationStart(animation: Animator?) {
+                    val itemImageView: ImageView? = item.actionView as ImageView?
+                    itemImageView?.setImageResource(R.drawable.ic_check_circle_white_24dp)
+                }
 
-                    override fun onAnimationEnd(animation: Animator?) {
-                        item.setIcon(R.drawable.ic_sync_white_24dp)
-                        item.actionView = null
-                    }
-                })
-                ?.start()
+                override fun onAnimationEnd(animation: Animator?) {
+                    item.setIcon(R.drawable.ic_sync_white_24dp)
+                    item.actionView = null
+                }
+            })
+            ?.start()
     }
 
     private fun failSyncAnim() {
