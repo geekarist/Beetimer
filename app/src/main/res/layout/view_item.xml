@@ -1,168 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="model"
-            type="me.cpele.fleabrainer.domain.GoalTiming"
-            />
+            type="me.cpele.fleabrainer.domain.GoalTiming" />
 
         <variable
             name="listener"
-            type="me.cpele.fleabrainer.ui.GoalViewListener"
-            />
+            type="me.cpele.fleabrainer.ui.GoalViewListener" />
     </data>
 
     <android.support.v7.widget.CardView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/item_cv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:onClick="@{() -> listener.onClickItem(model)}"
-        >
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:onClick="@{() -> listener.onClickItem(model)}">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
             android:paddingTop="8dp"
-            >
+            android:paddingBottom="8dp">
 
             <TextView
                 android:id="@+id/item_title"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingBottom="15dp"
+                android:layout_marginStart="8dp"
                 android:text="@{model.goal.title}"
-                android:textAlignment="center"
-                tools:text="Learn to be a more efficient developer"
-                />
-
-            <android.support.constraint.Guideline
-                android:id="@+id/item_guideline_left"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent=".42"
-                />
+                android:textAlignment="textStart"
+                app:layout_constraintEnd_toStartOf="@+id/item_timer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Learn" />
 
             <TextView
                 android:id="@+id/item_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:width="@dimen/item_timer_width"
-                android:gravity="center"
+                android:layout_marginEnd="8dp"
+                android:width="110sp"
                 android:onClick="@{() -> listener.onClickTimer(model)}"
                 android:onLongClick="@{() -> listener.onLongClickTimer(model)}"
-                android:textSize="@dimen/item_timer_text_size"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/item_title"
-                tools:text="00:00:00"
-                />
+                android:textAlignment="textEnd"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="@+id/item_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/item_title"
+                app:layout_constraintTop_toTopOf="@+id/item_title"
+                tools:text="00:00:00" />
 
-            <Button
-                android:id="@+id/item_submit"
-                style="@style/Widget.AppCompat.Button.Borderless"
+            <android.support.constraint.Barrier
+                android:id="@+id/item_title_barrier"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:onClick="@{() -> listener.onClickSubmit(model)}"
-                android:padding="0dp"
-                android:text="@string/item_submit"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintLeft_toLeftOf="@id/item_timer"
-                app:layout_constraintRight_toLeftOf="@+id/item_reset"
-                app:layout_constraintTop_toBottomOf="@id/item_timer"
-                />
-
-            <Button
-                android:id="@+id/item_reset"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:onClick="@{() -> listener.onClickReset(model)}"
-                android:padding="0dp"
-                android:text="@string/item_reset"
-                app:layout_constraintLeft_toRightOf="@id/item_submit"
-                app:layout_constraintRight_toRightOf="@id/item_timer"
-                app:layout_constraintTop_toBottomOf="@id/item_timer"
-                />
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="item_title,item_timer" />
 
             <TextView
                 android:id="@+id/item_id"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="@{model.goal.slug}"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@id/item_rate"
-                app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
-                app:layout_constraintRight_toLeftOf="@id/item_derail_days"
-                app:layout_constraintTop_toTopOf="@id/item_timer"
+                app:layout_constraintEnd_toStartOf="@+id/item_derail_days"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item_title_barrier"
                 app:layout_constraintVertical_bias="0"
                 app:layout_constraintVertical_chainStyle="packed"
-                tools:text="learn"
-                />
+                tools:text="learn" />
 
             <TextView
                 android:id="@+id/item_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="@{@string/item_rate(model.goal.formattedRate, model.goal.runits)}"
                 app:layout_constraintBottom_toTopOf="@id/item_bare_min"
-                app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
-                app:layout_constraintRight_toRightOf="@id/item_id"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/item_id"
-                tools:text="Rate: 42m/dy"
-                />
+                tools:text="Rate: 42m/dy" />
 
             <TextView
                 android:id="@+id/item_bare_min"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="@{model.goal.formattedLimsum}"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/item_guideline_left"
-                app:layout_constraintRight_toRightOf="@id/item_id"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/item_rate"
-                tools:text="+0.57 in 5 days"
-                />
+                tools:text="+0.57 in 5 days" />
 
             <TextView
                 android:id="@+id/item_derail_days"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="76sp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:background="@{context.resources.getColor(model.goal.color)}"
                 android:paddingTop="3dp"
                 android:text="@{@string/item_derail_date(model.goal.derailDays)}"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/item_timer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/item_id"
+                app:layout_constraintTop_toBottomOf="@+id/item_title_barrier"
                 tools:background="@color/green"
-                tools:text="4d"
-                />
+                tools:text="4d" />
 
             <TextView
                 android:id="@+id/item_derail_time"
                 android:layout_width="76sp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@{context.resources.getColor(model.goal.color)}"
                 android:paddingBottom="5dp"
                 android:text="@{@string/item_derail_time(model.goal.derailHours, model.goal.derailMin, model.goal.derailSec)}"
@@ -172,10 +138,10 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/item_derail_days"
                 tools:background="@color/green"
-                tools:text="16h 28m 49s"
-                />
+                tools:text="16h 28m 49s" />
 
             <TextView
+                android:id="@+id/item_derail_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:width="76sp"
@@ -184,8 +150,7 @@
                 android:textSize="12sp"
                 app:layout_constraintLeft_toLeftOf="@id/item_derail_time"
                 app:layout_constraintRight_toRightOf="@id/item_derail_time"
-                app:layout_constraintTop_toBottomOf="@id/item_derail_time"
-                />
+                app:layout_constraintTop_toBottomOf="@id/item_derail_time" />
 
         </android.support.constraint.ConstraintLayout>
 
