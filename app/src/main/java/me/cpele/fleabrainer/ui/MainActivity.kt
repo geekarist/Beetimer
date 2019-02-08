@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -90,6 +91,8 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         viewModel.submit(this, goalTiming)
     }
 
+    private val handler: Handler by lazy { Handler() }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         Log.d(localClassName, "onCreateOptionsMenu")
         val displayMenu = super.onCreateOptionsMenu(menu)
@@ -113,7 +116,7 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
             val timings = it?.sorted() ?: emptyList()
             mAdapter.submitList(timings)
             mAdapter.firstRunningItemPosition()?.let { pos ->
-                main_rv.smoothScrollToPosition(pos)
+                handler.postDelayed({ main_rv.smoothScrollToPosition(pos) }, 1000)
             }
         })
 
