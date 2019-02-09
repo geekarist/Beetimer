@@ -1,7 +1,5 @@
 package me.cpele.fleabrainer.ui
 
-import android.animation.Animator
-import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -13,12 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.WindowManager
-import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import me.cpele.fleabrainer.R
@@ -31,7 +24,6 @@ private const val ARG_ACCESS_TOKEN = "ACCESS_TOKEN"
 class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
 
     private lateinit var mAdapter: GoalAdapter
-    private var mMenu: Menu? = null
 
     private lateinit var repository: BeeRepository
 
@@ -68,6 +60,26 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
 
         mAdapter = GoalAdapter(this)
         main_rv.adapter = mAdapter
+
+        viewModel.status.observe(this, Observer {
+            Log.d(localClassName, "Activity received status: $it")
+            if (it?.status == Status.AUTH_ERROR) {
+                SignInActivity.start(context = this@MainActivity, clearToken = true)
+            }
+            it?.message?.apply {
+                Toast.makeText(this@MainActivity, this, Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        viewModel.goalTimings.observe(this, Observer {
+            Log.d(localClassName, "Activity received goals: $it")
+            supportActionBar?.subtitle = it?.firstOrNull()?.user
+            val timings = it?.sorted() ?: emptyList()
+            mAdapter.submitList(timings)
+            mAdapter.firstRunningItemPosition()?.let { pos ->
+                handler.postDelayed({ main_rv.smoothScrollToPosition(pos) }, 1000)
+            }
+        })
     }
 
     override fun onResume() {
@@ -92,105 +104,6 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
     }
 
     private val handler: Handler by lazy { Handler() }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        Log.d(localClassName, "onCreateOptionsMenu")
-        val displayMenu = super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.main_options_menu, menu)
-        mMenu = menu
-
-        viewModel.status.observe(this, Observer {
-            Log.d(localClassName, "Activity received status: $it")
-            triggerSyncStatus(it?.status ?: Status.LOADING)
-            if (it?.status == Status.AUTH_ERROR) {
-                SignInActivity.start(context = this@MainActivity, clearToken = true)
-            }
-            it?.message?.apply {
-                Toast.makeText(this@MainActivity, this, Toast.LENGTH_LONG).show()
-            }
-        })
-
-        viewModel.goalTimings.observe(this, Observer {
-            Log.d(localClassName, "Activity received goals: $it")
-            supportActionBar?.subtitle = it?.firstOrNull()?.user
-            val timings = it?.sorted() ?: emptyList()
-            mAdapter.submitList(timings)
-            mAdapter.firstRunningItemPosition()?.let { pos ->
-                handler.postDelayed({ main_rv.smoothScrollToPosition(pos) }, 1000)
-            }
-        })
-
-        return displayMenu
-    }
-
-    private fun triggerSyncStatus(status: Status) = when (status) {
-        Status.SUCCESS -> succeedSyncAnim()
-        Status.LOADING -> startSyncAnim()
-        Status.FAILURE, Status.AUTH_ERROR -> failSyncAnim()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-
-        Log.d(localClassName, "onOptionsItemSelected")
-        return when (item?.itemId) {
-            R.id.main_menu_sync -> {
-                viewModel.refresh()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    @SuppressLint("InflateParams")
-    private fun startSyncAnim() {
-
-        Log.d(localClassName, "startSyncAnim")
-
-        val syncAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_sync)
-        val syncActionView = LayoutInflater.from(this).inflate(R.layout.view_action_sync, null)
-        syncActionView.startAnimation(syncAnimation)
-
-        val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.actionView?.clearAnimation()
-        item?.actionView = syncActionView
-        item?.setIcon(R.drawable.ic_sync_white_24dp)
-    }
-
-    private fun succeedSyncAnim() {
-        Log.d(localClassName, "succeedSyncAnim")
-        val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.actionView?.clearAnimation()
-        item?.actionView
-            ?.animate()
-            ?.alpha(0f)
-            ?.setDuration(500)
-            ?.setListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
-                }
-
-                override fun onAnimationCancel(animation: Animator?) {
-                }
-
-                override fun onAnimationStart(animation: Animator?) {
-                    val itemImageView: ImageView? = item.actionView as ImageView?
-                    itemImageView?.setImageResource(R.drawable.ic_check_circle_white_24dp)
-                }
-
-                override fun onAnimationEnd(animation: Animator?) {
-                    item.setIcon(R.drawable.ic_sync_white_24dp)
-                    item.actionView = null
-                }
-            })
-            ?.start()
-    }
-
-    private fun failSyncAnim() {
-        Log.d(localClassName, "failSyncAnim")
-        val item = mMenu?.findItem(R.id.main_menu_sync)
-        item?.actionView?.clearAnimation()
-        item?.actionView = null
-        item?.setIcon(R.drawable.ic_sync_problem_white_24dp)
-    }
 
     override fun onOpen(goalTiming: GoalTiming) {
         DetailActivity.start(this, goalTiming.user, goalTiming.goal.slug)
