@@ -23,17 +23,17 @@ class DetailViewModel(
 ) : ViewModel() {
 
     val goalTiming: LiveData<GoalTiming> = beeRepository.asyncFindGoalTimingBySlug(slug)
-    val status: LiveData<StatusChange> = beeRepository.latestStatus
+    val status: LiveData<StatusChange> = beeRepository.findLatestStatus()
 
     fun startStopDrawable(context: Context): LiveData<Drawable> {
         val drawableData = MediatorLiveData<Drawable>()
-        drawableData.addSource(goalTiming, {
+        drawableData.addSource(goalTiming) {
             drawableData.value =
                 when (it?.stopwatch?.running) {
                     false -> context.getDrawable(R.drawable.ic_play_arrow_black_24dp)
                     else -> context.getDrawable(R.drawable.ic_pause_black_24dp)
                 }
-        })
+        }
         return drawableData
     }
 

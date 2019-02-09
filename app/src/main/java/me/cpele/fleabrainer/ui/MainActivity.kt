@@ -66,10 +66,13 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
             when (it?.status) {
-                Status.AUTH_ERROR -> SignInActivity.start(
-                    context = this@MainActivity,
-                    clearToken = true
-                )
+                Status.AUTH_ERROR -> {
+                    SignInActivity.start(
+                        context = this@MainActivity,
+                        clearToken = true
+                    )
+                    main_sr.isRefreshing = false
+                }
                 Status.LOADING -> main_sr.isRefreshing = true
                 else -> main_sr.isRefreshing = false
             }

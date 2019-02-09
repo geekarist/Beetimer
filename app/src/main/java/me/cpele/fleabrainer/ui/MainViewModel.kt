@@ -14,7 +14,7 @@ class MainViewModel(
         private val authToken: String?
 ) : ViewModel() {
 
-    val status: LiveData<StatusChange> = repository.latestStatus
+    val status: LiveData<StatusChange> = repository.findLatestStatus()
     val goalTimings: LiveData<List<GoalTiming>> = repository.goalTimings
 
     fun refresh() = repository.fetch(authToken)

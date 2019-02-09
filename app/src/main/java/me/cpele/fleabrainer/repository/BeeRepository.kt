@@ -1,8 +1,6 @@
 package me.cpele.fleabrainer.repository
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.Observer
 import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.migration.Migration
@@ -47,24 +45,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
     private val statusChangeDao: StatusChangeDao = database.statusDao()
     private val datapointDao: DatapointDao = database.datapointDao()
 
-    val latestStatus: LiveData<StatusChange>
-        get() {
-            val distinctLiveData = MediatorLiveData<StatusChange>()
-            distinctLiveData.addSource(
-                statusChangeDao.findLatestStatus(),
-                object : Observer<StatusChange> {
-                    var previousValue: StatusChange? = null
-                    override fun onChanged(value: StatusChange?) {
-                        val isChanging = value?.status != previousValue?.status
-                        if (isChanging) {
-                            previousValue = value
-                            distinctLiveData.value = value
-                        }
-                    }
-                })
-            return distinctLiveData
-        }
-
     val goalTimings: LiveData<List<GoalTiming>> get() = goalTimingDao.findAll()
 
     private fun insertOrUpdateGoalTimings(
@@ -106,8 +86,9 @@ class BeeRepository(context: Context, private val executor: Executor) {
 
         CustomApp.instance.api.getUser(accessToken).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
+                val msg = "Error loading user"
                 insertStatusChange(
-                    StatusChange(status = Status.failure("Error loading user", t)),
+                    StatusChange(status = Status.failure(msg, t), message = msg),
                     callback
                 )
             }
@@ -374,4 +355,6 @@ class BeeRepository(context: Context, private val executor: Executor) {
                 goalTimingDao.insertOne(it)
             }
     }
+
+    fun findLatestStatus(): LiveData<StatusChange> = statusChangeDao.findLatestStatus()
 }
