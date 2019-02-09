@@ -61,10 +61,17 @@ class MainActivity : AppCompatActivity(), GoalGeneralViewHolder.Listener {
         mAdapter = GoalAdapter(this)
         main_rv.adapter = mAdapter
 
+        main_sr.setOnRefreshListener { viewModel.refresh() }
+
         viewModel.status.observe(this, Observer {
             Log.d(localClassName, "Activity received status: $it")
-            if (it?.status == Status.AUTH_ERROR) {
-                SignInActivity.start(context = this@MainActivity, clearToken = true)
+            when (it?.status) {
+                Status.AUTH_ERROR -> SignInActivity.start(
+                    context = this@MainActivity,
+                    clearToken = true
+                )
+                Status.LOADING -> main_sr.isRefreshing = true
+                else -> main_sr.isRefreshing = false
             }
             it?.message?.apply {
                 Toast.makeText(this@MainActivity, this, Toast.LENGTH_SHORT).show()
