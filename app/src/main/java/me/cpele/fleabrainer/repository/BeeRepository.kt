@@ -141,7 +141,12 @@ class BeeRepository(context: Context, private val executor: Executor) {
             override fun onResponse(call: Call<List<Goal>>?, response: Response<List<Goal>>?) {
                 response?.body()?.apply {
                     insertOrUpdateGoalTimings(user, this) {
-                        insertStatusChange(StatusChange(status = Status.SUCCESS), callback)
+                        insertStatusChange(
+                            StatusChange(
+                                status = Status.SUCCESS,
+                                message = "Goals fetched successfully"
+                            ), callback
+                        )
                     }
                 }
             }
