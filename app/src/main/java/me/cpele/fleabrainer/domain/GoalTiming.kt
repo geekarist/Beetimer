@@ -13,5 +13,12 @@ data class GoalTiming(
     @Embedded val stopwatch: Stopwatch
 ) : Comparable<GoalTiming> {
 
-    override fun compareTo(other: GoalTiming): Int = stopwatch.compareTo(other.stopwatch)
+    override fun compareTo(other: GoalTiming): Int {
+        val stopwatchComparison = stopwatch.compareTo(other.stopwatch)
+        return if (stopwatchComparison != 0) {
+            stopwatchComparison
+        } else {
+            goal.compareTo(other.goal)
+        }
+    }
 }
