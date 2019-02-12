@@ -80,7 +80,7 @@ class DetailViewModel(
         private val slug: String
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return modelClass.cast(DetailViewModel(app, beeRepository, userName, slug))
+            return modelClass.cast(DetailViewModel(app, beeRepository, userName, slug)) as T
         }
     }
 }

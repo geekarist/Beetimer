@@ -21,11 +21,11 @@ class DetailAdapter : ListAdapter<DatapointBo, DetailViewHolder>(DetailAdapter.D
 
     private class DiffCalback : DiffUtil.ItemCallback<DatapointBo>() {
 
-        override fun areItemsTheSame(oldItem: DatapointBo?, newItem: DatapointBo?): Boolean {
-            return oldItem?.id == newItem?.id
+        override fun areItemsTheSame(oldItem: DatapointBo, newItem: DatapointBo): Boolean {
+            return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: DatapointBo?, newItem: DatapointBo?): Boolean {
+        override fun areContentsTheSame(oldItem: DatapointBo, newItem: DatapointBo): Boolean {
             return oldItem == newItem
         }
 

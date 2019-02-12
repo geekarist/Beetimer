@@ -12,11 +12,11 @@ class GoalAdapter(private val listener: GoalGeneralViewHolder.Listener) :
     ListAdapter<GoalTiming, GoalRecyclerViewHolder>(CustomItemCallback) {
 
     object CustomItemCallback : DiffUtil.ItemCallback<GoalTiming>() {
-        override fun areItemsTheSame(oldItem: GoalTiming?, newItem: GoalTiming?): Boolean {
-            return (oldItem?.id == newItem?.id)
+        override fun areItemsTheSame(oldItem: GoalTiming, newItem: GoalTiming): Boolean {
+            return (oldItem.id == newItem.id)
         }
 
-        override fun areContentsTheSame(oldItem: GoalTiming?, newItem: GoalTiming?): Boolean {
+        override fun areContentsTheSame(oldItem: GoalTiming, newItem: GoalTiming): Boolean {
             return (oldItem == newItem)
         }
     }

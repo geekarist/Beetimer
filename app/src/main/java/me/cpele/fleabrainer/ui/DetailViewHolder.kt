@@ -10,7 +10,7 @@ import me.cpele.fleabrainer.domain.formatHoursAsDuration
 
 private const val LEFT: Int = 0
 
-class DetailViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+class DetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(item: DatapointBo?) {
 

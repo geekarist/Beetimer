@@ -24,7 +24,7 @@ class MainViewModel(
             private val authToken: String?
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-                modelClass.cast(MainViewModel(repository, authToken))
+            modelClass.cast(MainViewModel(repository, authToken)) as T
     }
 
     fun persist(goalTiming: GoalTiming) = repository.persist(goalTiming)

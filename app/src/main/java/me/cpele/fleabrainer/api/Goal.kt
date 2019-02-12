@@ -74,7 +74,7 @@ data class Goal(
             val split = limsum.split(' ')
             return split.firstOrNull()?.let {
                 val rest = split
-                    .filterIndexed { index, s -> index > 0 }
+                    .filterIndexed { index, _ -> index > 0 }
                     .joinToString(" ")
                 return "${formatHoursAsDuration(it.toFloat())} $rest"
             }
